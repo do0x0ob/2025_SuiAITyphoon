@@ -31,8 +31,8 @@ module mosaicmint::mosaicmint {
         id: UID,
         owner: address,
         b36addr: String,
+        bio: String,
         photo_blob: String, // blob_id
-        detail_blob: String, // blob_id
     }
 
     // == One Time Witness ==
@@ -86,7 +86,7 @@ module mosaicmint::mosaicmint {
     public entry fun create_profile (
         state: &mut State,
         photo_blob: String,
-        detail_blob: String,
+        bio: String,
         ctx: &mut TxContext
     ) {
         let owner = tx_context::sender(ctx);
@@ -96,14 +96,14 @@ module mosaicmint::mosaicmint {
         let uid = object::new(ctx);
         let id = object::uid_to_inner(&uid);
         let address = object::uid_to_address(&uid);
-        let b36addr = to_b36(address);
-        
+        let b36addr = to_b36(address);  
+
         let profile = Profile {
             id: uid,
             owner,
             b36addr,
+            bio,
             photo_blob,
-            detail_blob,
         };
 
         let (mut kiosk, cap) = kiosk::new(ctx);
@@ -121,7 +121,7 @@ module mosaicmint::mosaicmint {
     public entry fun update_profile (
         profile: &mut Profile,
         photo_blob: Option<String>,
-        detail_blob: Option<String>,
+        bio: Option<String>,
         ctx: &mut TxContext
     ) {
         let owner = tx_context::sender(ctx);
@@ -129,8 +129,8 @@ module mosaicmint::mosaicmint {
         if (option::is_some(&photo_blob)) {
             profile.photo_blob = option::destroy_some(photo_blob);
         };
-        if (option::is_some(&detail_blob)) {
-            profile.detail_blob = option::destroy_some(detail_blob);
+        if (option::is_some(&bio)) {
+            profile.bio = option::destroy_some(bio);
         }
     }
 
