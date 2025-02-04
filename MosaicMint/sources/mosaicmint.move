@@ -19,7 +19,7 @@ module mosaicmint::mosaicmint {
 
     // const ENoProfile: u64 = 0;
     const EProfileExist: u64 = 1;
-
+    const ENotOwner: u64 = 2;
     // == STRUCTS ==
     public struct State has key {
         id: UID,
@@ -116,6 +116,22 @@ module mosaicmint::mosaicmint {
         vector::push_back(&mut state.all_profiles, id); 
 
         event::emit(ProfileCreated { id, owner });
+    }
+
+    public entry fun update_profile (
+        profile: &mut Profile,
+        photo_blob: Option<String>,
+        detail_blob: Option<String>,
+        ctx: &mut TxContext
+    ) {
+        let owner = tx_context::sender(ctx);
+        assert!(owner == profile.owner, ENotOwner);
+        if (option::is_some(&photo_blob)) {
+            profile.photo_blob = option::destroy_some(photo_blob);
+        };
+        if (option::is_some(&detail_blob)) {
+            profile.detail_blob = option::destroy_some(detail_blob);
+        }
     }
 
 }
