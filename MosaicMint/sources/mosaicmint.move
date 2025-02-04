@@ -35,7 +35,7 @@ module mosaicmint::mosaicmint {
         detail_blob: String, // blob_id
     }
 
-    // == OTW for display ==
+    // == One Time Witness ==
     public struct MOSAICMINT has drop {}
 
     // == EVENTS ==
