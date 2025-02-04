@@ -20,6 +20,7 @@ module mosaicmint::mosaicmint {
     // const ENoProfile: u64 = 0;
     const EProfileExist: u64 = 1;
     const ENotOwner: u64 = 2;
+
     // == STRUCTS ==
     public struct State has key {
         id: UID,
@@ -35,12 +36,18 @@ module mosaicmint::mosaicmint {
         photo_blob: String, // blob_id
     }
 
-    // == One Time Witness ==
+    // == ONE TIME WITNESS ==
+
     public struct MOSAICMINT has drop {}
 
     // == EVENTS ==
 
     public struct ProfileCreated has copy, drop {
+        id: ID,
+        owner: address,
+    }
+
+    public struct ProfileUpdated has copy, drop {
         id: ID,
         owner: address,
     }
@@ -53,7 +60,7 @@ module mosaicmint::mosaicmint {
 
         display.add(
             b"link".to_string(),
-            b"https://{b36addr}.walrus.site".to_string(),
+            b"https://{b36addr}.walrus.site".to_string(), // TODO: this should be the personal page(window) of the owner
         );
 
         display.add(
@@ -83,6 +90,7 @@ module mosaicmint::mosaicmint {
     }
 
     // == ENTRY FUNCTIONS ==
+
     public entry fun create_profile (
         state: &mut State,
         photo_blob: String,
@@ -125,13 +133,16 @@ module mosaicmint::mosaicmint {
         ctx: &mut TxContext
     ) {
         let owner = tx_context::sender(ctx);
+        let id = object::uid_to_inner(&profile.id);
         assert!(owner == profile.owner, ENotOwner);
         if (option::is_some(&photo_blob)) {
             profile.photo_blob = option::destroy_some(photo_blob);
         };
         if (option::is_some(&bio)) {
             profile.bio = option::destroy_some(bio);
-        }
+        };
+
+        event::emit(ProfileUpdated { id, owner });
     }
 
 }
