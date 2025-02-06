@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# wallet
+.wallet
+
+# Compiled JavaScript files
+*.js
+!next.config.js
+!postcss.config.js
+!tailwind.config.js
+
+# Build artifacts
+.next
+out
+dist
+build

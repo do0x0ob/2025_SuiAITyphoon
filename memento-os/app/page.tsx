@@ -8,13 +8,15 @@ const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
   ssr: false,
 });
 
-type WindowName = 'main' | 'about';
+type WindowName = 'memento' | 'about' | 'files' | 'browser';
 
 export default function Home() {
-  const [openWindows, setOpenWindows] = useState<WindowName[]>(["main"]); // 預設窗口
+  const [openWindows, setOpenWindows] = useState<WindowName[]>(["memento"]); // 預設窗口
   const [windowPositions, setWindowPositions] = useState<Record<WindowName, { x: number; y: number }>>({
-    main: { x: 100, y: 100 },
-    about: { x: 150, y: 150 }
+    memento: { x: 100, y: 100 },
+    about: { x: 150, y: 150 },
+    files: { x: 200, y: 100 },
+    browser: { x: 250, y: 100 }
   });
   const [draggingWindow, setDraggingWindow] = useState<WindowName | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -31,9 +33,9 @@ export default function Home() {
     setOpenWindows(openWindows.filter((name) => name !== windowName as WindowName));
   };
 
-  // 模擬 Connect Wallet 功能
+  // 簡單的 Connect Wallet 功能
   const connectWallet = () => {
-    console.log("Wallet connected!"); // 這裡可以替換為 Sui SDK 的集成邏輯
+    console.log("Wallet connected!"); 
     alert("Wallet connected!");
   };
 
@@ -80,20 +82,37 @@ export default function Home() {
       {/* 桌面圖標 */}
       <div className="absolute top-4 right-4 flex flex-col gap-4">
         <DesktopIcon
+          label="Memento"
+          onClick={() => handleOpenWindow("memento")}
+          icon="🎨"
+        />
+        <DesktopIcon
           label="About"
           onClick={() => handleOpenWindow("about")}
-          icon="?"
+          icon="ℹ️"
+        />
+        <DesktopIcon
+          label="Files"
+          onClick={() => handleOpenWindow("files")}
+          icon="/file.svg"
+          iconType="image"
+        />
+        <DesktopIcon
+          label="Browser"
+          onClick={() => handleOpenWindow("browser")}
+          icon="/globe.svg"
+          iconType="image"
         />
       </div>
 
-      {/* 窗口渲染 */}
-      {openWindows.includes("main") && (
+      {/* Memento 窗口 */}
+      {openWindows.includes("memento") && (
         <div
           className="absolute w-96 h-72 bg-white border border-gray-500 shadow-lg"
           style={{
-            top: `${windowPositions.main.y}px`,
-            left: `${windowPositions.main.x}px`,
-            cursor: draggingWindow === 'main' ? 'grabbing' : 'default',
+            top: `${windowPositions.memento.y}px`,
+            left: `${windowPositions.memento.x}px`,
+            cursor: draggingWindow === 'memento' ? 'grabbing' : 'default',
           }}
         >
           {/* 窗口標題欄 */}
