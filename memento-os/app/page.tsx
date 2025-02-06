@@ -28,17 +28,30 @@ export default function Home() {
     files: { width: 384, height: 288 },
     browser: { width: 384, height: 288 }
   });
+  const [activeWindow, setActiveWindow] = useState<WindowName | null>("memento");
 
-  // 打開新的窗口
+  // 處理窗口激活
+  const handleWindowActivate = (windowName: WindowName) => {
+    setActiveWindow(windowName);
+  };
+
+  // 修改打開窗口的處理函數
   const handleOpenWindow = (windowName: string) => {
-    if (!openWindows.includes(windowName as WindowName)) {
+    if (openWindows.includes(windowName as WindowName)) {
+      setOpenWindows(openWindows.filter(name => name !== windowName as WindowName));
+      setActiveWindow(null);
+    } else {
       setOpenWindows([...openWindows, windowName as WindowName]);
+      setActiveWindow(windowName as WindowName);
     }
   };
 
-  // 關閉窗口
+  // 修改關閉窗口的處理函數
   const handleCloseWindow = (windowName: string) => {
     setOpenWindows(openWindows.filter((name) => name !== windowName as WindowName));
+    if (activeWindow === windowName) {
+      setActiveWindow(null);
+    }
   };
 
   // 簡單的 Connect Wallet 功能
@@ -47,9 +60,10 @@ export default function Home() {
     alert("Wallet connected!");
   };
 
-  // 開始拖動窗口
+  // 修改拖動開始的處理函數
   const handleDragStart = (e: React.MouseEvent, windowName: string) => {
     setDraggingWindow(windowName as WindowName);
+    setActiveWindow(windowName as WindowName);
     setDragOffset({
       x: e.clientX - windowPositions[windowName as WindowName].x,
       y: e.clientY - windowPositions[windowName as WindowName].y,
@@ -116,71 +130,94 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="relative w-full h-screen bg-blue-800 overflow-hidden"
-      onMouseMove={handleDragMove}
-      onMouseUp={handleDragEnd}
-    >
-      {/* 桌面背景 */}
-      <div className="absolute inset-0 bg-blue-900 bg-opacity-50"></div>
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* 基礎背景 - 純粉色 */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundColor: '#FEE2E2',
+        }}
+      />
 
-      {/* 桌面圖標 */}
-      <div className="absolute top-4 right-4 flex flex-col gap-4">
-        <DesktopIcon
-          label="Memento"
-          onClick={() => handleOpenWindow("memento")}
-          icon="🎨"
-        />
-        <DesktopIcon
-          label="About"
-          onClick={() => handleOpenWindow("about")}
-          icon="ℹ️"
-        />
-        <DesktopIcon
-          label="Files"
-          onClick={() => handleOpenWindow("files")}
-          icon="/file.svg"
-          iconType="image"
-        />
-        <DesktopIcon
-          label="Browser"
-          onClick={() => handleOpenWindow("browser")}
-          icon="/globe.svg"
-          iconType="image"
-        />
+      {/* 漸層效果 */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(rgba(252, 213, 206, 0.3), rgba(252, 213, 206, 0.3))',
+        }}
+      />
+
+      {/* 主要內容容器 */}
+      <div 
+        className="relative w-full h-full z-10"
+        onMouseMove={handleDragMove}
+        onMouseUp={handleDragEnd}
+      >
+        {/* 桌面圖標 */}
+        <div className="absolute top-4 right-4 flex flex-col gap-6">
+          <DesktopIcon
+            label="Memento"
+            onClick={() => handleOpenWindow("memento")}
+            icon="🎨"
+          />
+          <DesktopIcon
+            label="About"
+            onClick={() => handleOpenWindow("about")}
+            icon="ℹ️"
+          />
+          <DesktopIcon
+            label="Files"
+            onClick={() => handleOpenWindow("files")}
+            icon="/file.svg"
+            iconType="image"
+          />
+          <DesktopIcon
+            label="Browser"
+            onClick={() => handleOpenWindow("browser")}
+            icon="/globe.svg"
+            iconType="image"
+          />
+        </div>
+
+        {/* Memento 窗口 */}
+        {openWindows.includes("memento") && (
+          <Window
+            name="memento"
+            title="Memento"
+            position={windowPositions.memento}
+            size={windowSizes.memento}
+            isActive={activeWindow === 'memento'}
+            onClose={handleCloseWindow}
+            onDragStart={handleDragStart}
+            onResize={handleResize}
+            onClick={() => handleWindowActivate("memento")}
+          >
+            <div className="p-4">
+              <ConnectButton />
+            </div>
+          </Window>
+        )}
+
+        {/* About 窗口 */}
+        {openWindows.includes("about") && (
+          <Window
+            name="about"
+            title="About"
+            position={windowPositions.about}
+            size={windowSizes.about}
+            isActive={activeWindow === 'about'}
+            onClose={handleCloseWindow}
+            onDragStart={handleDragStart}
+            onResize={handleResize}
+            onClick={() => handleWindowActivate("about")}
+          >
+            <div className="p-4">
+              <h2 className="text-xl mb-4">About Memento OS</h2>
+              <p>A web3 operating system for the modern age.</p>
+            </div>
+          </Window>
+        )}
       </div>
-
-      {/* Memento 窗口 */}
-      {openWindows.includes("memento") && (
-        <Window
-          name="memento"
-          title="Memento"
-          position={windowPositions.memento}
-          size={windowSizes.memento}
-          isActive={draggingWindow === 'memento'}
-          onClose={handleCloseWindow}
-          onDragStart={handleDragStart}
-          onResize={handleResize}
-        >
-          <ConnectButton />
-        </Window>
-      )}
-
-      {/* About 窗口 */}
-      {openWindows.includes("about") && (
-        <Window
-          name="about"
-          title="About"
-          position={windowPositions.about}
-          size={windowSizes.about}
-          isActive={draggingWindow === 'about'}
-          onClose={handleCloseWindow}
-          onDragStart={handleDragStart}
-          onResize={handleResize}
-        >
-          <p className="text-gray-700">This is the About window content!</p>
-        </Window>
-      )}
     </div>
   );
 }

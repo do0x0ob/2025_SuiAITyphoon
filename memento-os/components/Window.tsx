@@ -11,6 +11,8 @@ interface WindowProps {
   onDragStart: (e: React.MouseEvent, name: WindowName) => void;
   onResize: (e: React.MouseEvent, name: WindowName, direction: string) => void;
   children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
 }
 
 const Window: React.FC<WindowProps> = ({
@@ -22,38 +24,51 @@ const Window: React.FC<WindowProps> = ({
   onClose,
   onDragStart,
   onResize,
-  children
+  children,
+  onClick,
 }) => {
   return (
     <div
-      className="absolute bg-white border border-gray-500 shadow-lg"
+      className={`absolute bg-white rounded-lg shadow-lg border border-gray-200 ${
+        isActive ? 'z-50' : 'z-40'
+      }`}
       style={{
-        width: `${size.width}px`,
-        height: `${size.height}px`,
         top: `${position.y}px`,
         left: `${position.x}px`,
+        width: size ? `${size.width}px` : 'auto',
+        height: size ? `${size.height}px` : 'auto',
         cursor: isActive ? 'grabbing' : 'default',
-        zIndex: isActive ? 10 : 1,
       }}
+      onClick={onClick}
     >
       <div
-        className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 cursor-grab"
+        className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg cursor-grab"
         onMouseDown={(e) => onDragStart(e, name)}
       >
-        <span>{title}</span>
+        <span className="text-sm font-mono text-gray-700">{title}</span>
         <button
-          className="text-red-500 font-bold"
-          onClick={() => onClose(name)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(name);
+          }}
+          className="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded"
         >
-          X
+          ✕
         </button>
       </div>
-      <div className="p-4 flex flex-col gap-4">
+      <div className="p-4 bg-white rounded-b-lg">
         {children}
       </div>
       <div
         className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
-        onMouseDown={(e) => onResize(e, name, "se")}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onResize(e, name, "se");
+        }}
+        style={{
+          background: 'transparent',
+          touchAction: 'none',
+        }}
       />
     </div>
   );
