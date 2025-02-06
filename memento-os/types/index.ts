@@ -1,1 +1,1 @@
-export type WindowName = 'memento' | 'about' | 'files' | 'browser'; 
+export type WindowName = 'memento' | 'about' | 'files'; 
