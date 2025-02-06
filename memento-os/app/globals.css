@@ -19,3 +19,31 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 添加復古的陰影效果 */
+.window-shadow {
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 添加復古的邊框效果 */
+.retro-border {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+/* 添加顆粒感 */
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/grain.png');
+  opacity: 0.05;
+  pointer-events: none;
+}
