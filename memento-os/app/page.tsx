@@ -113,17 +113,17 @@ export default function Home() {
             top: `${windowPositions.memento.y}px`,
             left: `${windowPositions.memento.x}px`,
             cursor: draggingWindow === 'memento' ? 'grabbing' : 'default',
+            zIndex: draggingWindow === 'memento' ? 10 : 1,  // 添加 zIndex
           }}
         >
-          {/* 窗口標題欄 */}
           <div
             className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 cursor-grab"
-            onMouseDown={(e) => handleDragStart(e, "main")}
+            onMouseDown={(e) => handleDragStart(e, "memento")}  // 改為 "memento"
           >
-            <span>Main Window</span>
+            <span>Memento</span>  {/* 改為 Memento */}
             <button
               className="text-red-500 font-bold"
-              onClick={() => handleCloseWindow("main")}
+              onClick={() => handleCloseWindow("memento")}  // 改為 "memento"
             >
               X
             </button>
