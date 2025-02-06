@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { ConnectButton } from '@mysten/dapp-kit';
+import '@mysten/dapp-kit/dist/index.css';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -113,29 +115,23 @@ export default function Home() {
             top: `${windowPositions.memento.y}px`,
             left: `${windowPositions.memento.x}px`,
             cursor: draggingWindow === 'memento' ? 'grabbing' : 'default',
-            zIndex: draggingWindow === 'memento' ? 10 : 1,  // 添加 zIndex
+            zIndex: draggingWindow === 'memento' ? 10 : 1,
           }}
         >
           <div
             className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 cursor-grab"
-            onMouseDown={(e) => handleDragStart(e, "memento")}  // 改為 "memento"
+            onMouseDown={(e) => handleDragStart(e, "memento")}
           >
-            <span>Memento</span>  {/* 改為 Memento */}
+            <span>Memento</span>
             <button
               className="text-red-500 font-bold"
-              onClick={() => handleCloseWindow("memento")}  // 改為 "memento"
+              onClick={() => handleCloseWindow("memento")}
             >
               X
             </button>
           </div>
-          {/* 窗口內容 */}
-          <div className="p-4">
-            <button
-              onClick={connectWallet}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Connect Wallet
-            </button>
+          <div className="p-4 flex flex-col gap-4">
+            <ConnectButton />
           </div>
         </div>
       )}
