@@ -4,13 +4,13 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ConnectButton } from '@mysten/dapp-kit';
 import '@mysten/dapp-kit/dist/index.css';
+import Window from '@/components/Window';
+import type { WindowName } from '../types';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
   ssr: false,
 });
-
-type WindowName = 'memento' | 'about' | 'files' | 'browser';
 
 export default function Home() {
   const [openWindows, setOpenWindows] = useState<WindowName[]>(["memento"]); // 預設窗口
@@ -22,6 +22,12 @@ export default function Home() {
   });
   const [draggingWindow, setDraggingWindow] = useState<WindowName | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [windowSizes, setWindowSizes] = useState<Record<WindowName, { width: number; height: number }>>({
+    memento: { width: 384, height: 288 },
+    about: { width: 384, height: 288 },
+    files: { width: 384, height: 288 },
+    browser: { width: 384, height: 288 }
+  });
 
   // 打開新的窗口
   const handleOpenWindow = (windowName: string) => {
@@ -72,6 +78,43 @@ export default function Home() {
     setDraggingWindow(null);
   };
 
+  // 處理窗口縮放
+  const handleResize = (e: React.MouseEvent, windowName: WindowName, direction: string) => {
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = windowSizes[windowName].width;
+    const startHeight = windowSizes[windowName].height;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (direction.includes('e')) {
+        newWidth = Math.min(800, Math.max(300, startWidth + deltaX));
+      }
+      if (direction.includes('s')) {
+        newHeight = Math.min(600, Math.max(200, startHeight + deltaY));
+      }
+
+      setWindowSizes(prev => ({
+        ...prev,
+        [windowName]: { width: newWidth, height: newHeight }
+      }));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   return (
     <div
       className="relative w-full h-screen bg-blue-800 overflow-hidden"
@@ -109,62 +152,34 @@ export default function Home() {
 
       {/* Memento 窗口 */}
       {openWindows.includes("memento") && (
-        <div
-          className="absolute w-96 h-72 bg-white border border-gray-500 shadow-lg"
-          style={{
-            top: `${windowPositions.memento.y}px`,
-            left: `${windowPositions.memento.x}px`,
-            cursor: draggingWindow === 'memento' ? 'grabbing' : 'default',
-            zIndex: draggingWindow === 'memento' ? 10 : 1,
-          }}
+        <Window
+          name="memento"
+          title="Memento"
+          position={windowPositions.memento}
+          size={windowSizes.memento}
+          isActive={draggingWindow === 'memento'}
+          onClose={handleCloseWindow}
+          onDragStart={handleDragStart}
+          onResize={handleResize}
         >
-          <div
-            className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 cursor-grab"
-            onMouseDown={(e) => handleDragStart(e, "memento")}
-          >
-            <span>Memento</span>
-            <button
-              className="text-red-500 font-bold"
-              onClick={() => handleCloseWindow("memento")}
-            >
-              X
-            </button>
-          </div>
-          <div className="p-4 flex flex-col gap-4">
-            <ConnectButton />
-          </div>
-        </div>
+          <ConnectButton />
+        </Window>
       )}
 
       {/* About 窗口 */}
       {openWindows.includes("about") && (
-        <div
-          className="absolute w-96 h-72 bg-white border border-gray-500 shadow-lg"
-          style={{
-            top: `${windowPositions.about.y}px`,
-            left: `${windowPositions.about.x}px`,
-            cursor: draggingWindow === 'about' ? 'grabbing' : 'default',
-            zIndex: draggingWindow === 'about' ? 10 : 1,  // 添加 zIndex 確保拖動時在最上層
-          }}
+        <Window
+          name="about"
+          title="About"
+          position={windowPositions.about}
+          size={windowSizes.about}
+          isActive={draggingWindow === 'about'}
+          onClose={handleCloseWindow}
+          onDragStart={handleDragStart}
+          onResize={handleResize}
         >
-          {/* 窗口標題欄 */}
-          <div
-            className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 cursor-grab"
-            onMouseDown={(e) => handleDragStart(e, "about")}
-          >
-            <span>About Window</span>
-            <button
-              className="text-red-500 font-bold"
-              onClick={() => handleCloseWindow("about")}
-            >
-              X
-            </button>
-          </div>
-          {/* 窗口內容 */}
-          <div className="p-4">
-            <p className="text-gray-700">This is the About window content!</p>
-          </div>
-        </div>
+          <p className="text-gray-700">This is the About window content!</p>
+        </Window>
       )}
     </div>
   );
