@@ -134,3 +134,10 @@ div[role="menuitem"].AccountDropdownMenu_switchAccountMenuItem__div2ql4:hover {
 div.AccountDropdownMenu_separator__div2ql5 {
   display: none !important;
 }
+
+/* 添加圖片樣式 */
+.memento-image {
+  image-rendering: pixelated;  /* 保持復古像素風格 */
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+}

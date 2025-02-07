@@ -2,16 +2,16 @@ import React from 'react';
 import type { WindowName } from '../types';
 
 interface WindowProps {
-  name: string;
+  name: WindowName;
   title: string;
   position: { x: number; y: number };
-  size?: { width: number; height: number };
-  isActive: boolean;
+  size: { width: number; height: number };
+  isActive?: boolean;
   resizable?: boolean;  // 新增縮放配置
-  onClose: (name: string) => void;
-  onDragStart: (e: React.MouseEvent, name: string) => void;
-  onResize?: (e: React.MouseEvent, name: string) => void;
-  onClick: () => void;  // 新增：點擊事件
+  onClose: (name: WindowName) => void;
+  onDragStart: (e: React.MouseEvent<Element>, name: WindowName) => void;
+  onResize?: (e: React.MouseEvent, name: WindowName) => void;
+  onClick?: () => void;
   children: React.ReactNode;
 }
 

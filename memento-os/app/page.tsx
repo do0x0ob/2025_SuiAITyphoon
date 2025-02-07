@@ -29,9 +29,9 @@ export default function Home() {
   const mementoSize = { width: 600, height: 600 };
   const defaultSize = { width: 500, height: 400 };
 
-  const [openWindows, setOpenWindows] = useState<string[]>(['memento']);
-  const [activeWindow, setActiveWindow] = useState<string>('memento');  // 新增：追蹤當前活動窗口
-  const [draggingWindow, setDraggingWindow] = useState<string | null>(null);
+  const [openWindows, setOpenWindows] = useState<WindowName[]>(['memento']);
+  const [activeWindow, setActiveWindow] = useState<WindowName | null>('memento');
+  const [draggingWindow, setDraggingWindow] = useState<WindowName | null>(null);
   const [windowPositions, setWindowPositions] = useState({
     memento: { x: 0, y: 0 },
     phonebook: { x: 150, y: 150 },
@@ -57,18 +57,13 @@ export default function Home() {
   }, []); // 只在組件掛載時執行一次
 
   // 新增：處理窗口激活的函數
-  const handleWindowActivate = (name: string) => {
+  const handleWindowActivate = (name: WindowName) => {
     setActiveWindow(name);
-    
-    // 將當前窗口移到陣列末尾（最上層）
-    setOpenWindows(prev => [
-      ...prev.filter(w => w !== name),
-      name
-    ]);
+    setOpenWindows(prev => [...prev.filter(w => w !== name), name]);
   };
 
   // 修改打開窗口的處理函數
-  const handleOpenWindow = (name: string) => {
+  const handleOpenWindow = (name: WindowName) => {
     if (openWindows.includes(name)) {
       setOpenWindows(openWindows.filter(window => window !== name));
       if (draggingWindow === name) {
@@ -76,7 +71,6 @@ export default function Home() {
       }
     } else {
       setOpenWindows([...openWindows, name]);
-      // 如果是打開 Memento 窗口，重新計算中心位置
       if (name === 'memento') {
         const centerPosition = getCenterPosition(mementoSize.width, mementoSize.height);
         setWindowPositions(prev => ({
@@ -88,10 +82,10 @@ export default function Home() {
   };
 
   // 修改關閉窗口的處理函數
-  const handleCloseWindow = (name: string) => {
-    setOpenWindows(openWindows.filter(window => window !== name));
-    if (draggingWindow === name) {
-      setDraggingWindow(null);
+  const handleCloseWindow = (name: WindowName) => {
+    setOpenWindows(prev => prev.filter(w => w !== name));
+    if (activeWindow === name) {
+      setActiveWindow(null);
     }
   };
 
@@ -102,22 +96,25 @@ export default function Home() {
   };
 
   // 修改拖動開始的處理函數
-  const handleDragStart = (e: React.MouseEvent, name: string) => {
+  const handleDragStart = (e: React.MouseEvent<Element>, windowName: WindowName) => {
     e.preventDefault();
-    handleWindowActivate(name);  // 激活窗口
-    setDraggingWindow(name);
+    handleWindowActivate(windowName);
+    setDraggingWindow(windowName);
     
-    const startX = e.clientX - windowPositions[name as keyof typeof windowPositions].x;
-    const startY = e.clientY - windowPositions[name as keyof typeof windowPositions].y;
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
 
     const handleMouseMove = (e: MouseEvent) => {
-      e.preventDefault();
+      const windowWidth = windowSizes[windowName].width;
+      const windowHeight = windowSizes[windowName].height;
+      
+      const newX = Math.max(0, Math.min(e.clientX - offsetX, window.innerWidth - windowWidth));
+      const newY = Math.max(0, Math.min(e.clientY - offsetY, window.innerHeight - windowHeight));
+
       setWindowPositions(prev => ({
         ...prev,
-        [name]: {
-          x: e.clientX - startX,
-          y: e.clientY - startY,
-        },
+        [windowName]: { x: newX, y: newY }
       }));
     };
 
@@ -131,38 +128,16 @@ export default function Home() {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  // 拖動窗口過程
-  const handleDragMove = (e: React.MouseEvent) => {
-    if (draggingWindow) {
-      const newX = e.clientX - windowPositions[draggingWindow as WindowName].x;
-      const newY = e.clientY - windowPositions[draggingWindow as WindowName].y;
-
-      // 確保窗口不超出瀏覽器邊界
-      const clampedX = Math.max(0, Math.min(window.innerWidth - 384, newX));
-      const clampedY = Math.max(0, Math.min(window.innerHeight - 288, newY));
-
-      setWindowPositions(prev => ({
-        ...prev,
-        [draggingWindow]: { x: clampedX, y: clampedY }
-      }));
-    }
-  };
-
-  // 停止拖動窗口
-  const handleDragEnd = () => {
-    setDraggingWindow(null);
-  };
-
   // 處理窗口縮放
-  const handleResize = (e: React.MouseEvent, name: string) => {
-    e.preventDefault();  // 防止默認拖動行為
+  const handleResize = (e: React.MouseEvent, name: WindowName) => {
+    e.preventDefault();
     const startX = e.clientX;
     const startY = e.clientY;
-    const startWidth = windowSizes[name as keyof typeof windowSizes].width;
-    const startHeight = windowSizes[name as keyof typeof windowSizes].height;
+    const startWidth = windowSizes[name].width;
+    const startHeight = windowSizes[name].height;
 
     const handleMouseMove = (e: MouseEvent) => {
-      e.preventDefault();  // 防止默認拖動行為
+      e.preventDefault();
       setWindowSizes(prev => ({
         ...prev,
         [name]: {
@@ -184,7 +159,9 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="relative w-full h-screen overflow-hidden pt-6 pb-6">  {/* 添加 padding 來為 header 和 footer 留出空間 */}
+      <div 
+        className="relative w-full h-screen overflow-hidden pt-6 pb-6"
+      >
         {/* 基礎背景 - 更淺的粉色 */}
         <div 
           className="absolute inset-0"
@@ -228,8 +205,6 @@ export default function Home() {
         {/* 主要內容容器 */}
         <div 
           className="relative w-full h-full z-10"
-          onMouseMove={handleDragMove}
-          onMouseUp={handleDragEnd}
         >
           {/* 桌面圖標 */}
           <div className="absolute top-4 right-4 flex flex-col gap-6">
@@ -273,18 +248,27 @@ export default function Home() {
                     size={windowSizes.memento}
                     isActive={activeWindow === 'memento'}
                     resizable={false}
-                    onClose={handleCloseWindow}
-                    onDragStart={handleDragStart}
+                    onClose={(name: WindowName) => handleCloseWindow(name)}
+                    onDragStart={(e: React.MouseEvent<Element>, name: WindowName) => handleDragStart(e, name)}
                     onClick={() => handleWindowActivate('memento')}
                   >
-                    <div className="p-4">
-                      <ConnectButton 
-                        style={retroButtonStyles.button} 
-                        onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
-                        onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
-                        connectText="Connect Wallet"
-                        className="retro-button"
-                      />
+                    <div className="p-4 h-full flex flex-col justify-between">
+                      <div className="flex justify-center items-center flex-1">
+                        <img 
+                          src="/images/memento.png" 
+                          alt="Memento"
+                          className="w-[90%] h-auto memento-image"
+                        />
+                      </div>
+                      <div className="flex justify-center mt-4">
+                        <ConnectButton 
+                          style={retroButtonStyles.button} 
+                          onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
+                          onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
+                          connectText="Connect Wallet"
+                          className="retro-button"
+                        />
+                      </div>
                     </div>
                   </Window>
                 );
