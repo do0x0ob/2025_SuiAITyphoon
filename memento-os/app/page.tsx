@@ -9,6 +9,7 @@ import Window from '@/components/Window';
 import Header from '@/components/Header';
 import { retroButtonStyles } from '@/styles/components';
 import PhoneBook from '@/components/PhoneBook';
+import { ASCII_ART } from '@/constants/ascii';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -29,6 +30,7 @@ export default function Home() {
   // 修改 Memento 窗口的默認尺寸為 600x600
   const mementoSize = { width: 600, height: 600 };
   const defaultSize = { width: 500, height: 400 };
+  const aboutSize = { width: 540, height: 400 };  // About 窗口的專門尺寸
 
   const [openWindows, setOpenWindows] = useState<WindowName[]>(['memento']);
   const [activeWindow, setActiveWindow] = useState<WindowName | null>('memento');
@@ -44,7 +46,7 @@ export default function Home() {
     memento: mementoSize,
     phonebook: defaultSize,
     eventbook: defaultSize,
-    about: defaultSize,
+    about: aboutSize,     // 使用新的尺寸
     help: defaultSize,
   });
 
@@ -331,8 +333,13 @@ export default function Home() {
                       onClick={() => handleWindowActivate('about')}
                     >
                       <div className="p-4">
-                        <h2 className="text-xl font-medium mb-4">About Memento OS</h2>
-                        <p className="text-gray-800">A web3 operating system for the modern age.</p>
+                        <pre className="text-[0.6rem] leading-[1.15] font-mono mb-4 select-none">
+                          {ASCII_ART.MEMENTO_OS}
+                        </pre>
+                        <p className="text-gray-800">{ASCII_ART.ABOUT}</p>
+                        <pre className="text-[0.6rem] leading-[1.15] font-mono mb-4 select-none">
+                          {'\n' + ASCII_ART.AUTHOR_2}
+                        </pre>
                       </div>
                     </Window>
                   );
