@@ -35,13 +35,13 @@ const Header = () => {
       }}
     >
       <button 
-        className="text-xs font-mono font-bold hover:text-gray-600 transition-colors cursor-pointer"
+        className="text-xs font-mono font-bold text-black hover:text-gray-600 transition-colors cursor-pointer"
         onClick={() => {/* 待實現 */}}
       >
         Memento OS
       </button>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-black">
         <span className="text-xs font-mono font-bold">{currentDate}</span>
         <div className="h-3 border-l border-black/80"></div>
         <span className="text-xs font-mono font-bold">{currentTime}</span>
