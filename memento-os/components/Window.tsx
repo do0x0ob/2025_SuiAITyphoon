@@ -59,12 +59,13 @@ const Window: React.FC<WindowProps> = ({
     >
       {/* 窗口標題欄 */}
       <div
-        className="flex items-center cursor-grab relative"  // 移除 px-3，添加 relative
+        className="flex items-center cursor-grab relative"
         style={{
           borderBottom: '1px solid rgba(0, 0, 0, 0.8)',
           backgroundColor: 'rgba(255, 252, 250, 0.85)',
-          height: '24px',
+          height: '24px',  // 確保所有窗口的 header 高度一致
           minHeight: '24px',
+          lineHeight: '24px',  // 添加行高以確保文字垂直居中
         }}
         onMouseDown={(e) => onDragStart(e, name)}
       >
@@ -73,12 +74,14 @@ const Window: React.FC<WindowProps> = ({
             e.stopPropagation();
             onClose(name);
           }}
-          className="px-2 py-0 text-sm font-bold text-gray-900 hover:text-black leading-none ml-1"  // 調整左邊距
+          className="px-2 py-0 text-sm font-bold text-gray-900 hover:text-black leading-none ml-1"
+          style={{ height: '24px', lineHeight: '24px' }}  // 確保按鈕高度一致
         >
           ✕
         </button>
         <span 
-          className="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider leading-none absolute right-2"  // 使用絕對定位靠右
+          className="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider leading-none absolute right-2"
+          style={{ lineHeight: '24px' }}  // 確保標題文字垂直居中
         >
           {title}
         </span>
