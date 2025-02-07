@@ -29,7 +29,7 @@ const Window: React.FC<WindowProps> = ({
   children,
 }) => {
   const bgStyle = {
-    backgroundColor: 'rgba(255, 252, 250, 0.7)',
+    backgroundColor: '#FFF5F5',  // 改為與主畫面相同的背景色
     backdropFilter: 'blur(8px)',
   };
 
@@ -62,7 +62,7 @@ const Window: React.FC<WindowProps> = ({
         className="flex items-center cursor-grab relative"
         style={{
           borderBottom: '1px solid rgba(0, 0, 0, 0.8)',
-          backgroundColor: 'rgba(255, 252, 250, 0.85)',
+          backgroundColor: '#FFF5F5',  // 改為與主畫面相同的背景色
           height: '24px',
           minHeight: '24px',
           lineHeight: '24px',
@@ -77,7 +77,7 @@ const Window: React.FC<WindowProps> = ({
       >
         <button
           onClick={(e) => {
-            e.stopPropagation();  // 阻止事件冒泡
+            e.stopPropagation();
             onClose(name);
           }}
           className="px-2 py-0 text-sm font-bold text-gray-900 hover:text-black leading-none ml-1 cursor-pointer"
