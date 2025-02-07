@@ -17,23 +17,21 @@ const DesktopIcon = ({ label, onClick, icon }: DesktopIconProps) => {
 
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={(e) => e.key === 'Enter' && handleClick(e as unknown as React.MouseEvent)}
-      className="group flex flex-col items-center w-full px-2 py-1 hover:bg-black/5 relative cursor-pointer"
+      onClick={onClick}
+      className="relative group w-full flex justify-center py-1 cursor-pointer"
     >
       <span className="text-3xl select-none">{icon}</span>
-      <span 
-        className="text-[8px] font-mono text-center text-black/80 whitespace-nowrap mt-0.5 select-none"
+      
+      {/* 氣泡提示 */}
+      <div className="absolute left-full ml-2 px-2 py-1 bg-black/80 text-white text-[10px] font-mono rounded 
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
         style={{ 
-          maxWidth: '100%',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
+          top: '50%',
+          transform: 'translateY(-50%)'
         }}
       >
         {label}
-      </span>
+      </div>
     </div>
   );
 };

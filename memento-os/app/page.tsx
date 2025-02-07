@@ -200,9 +200,10 @@ export default function Home() {
         <div className="relative w-full h-full z-10">
           {/* 左側面板 */}
           <div 
-            className="fixed left-0 top-6 bottom-0 w-16 bg-white/20 backdrop-blur-sm border-r border-black/20 z-50 pointer-events-none"
+            className="fixed left-0 top-6 bottom-0 w-16 bg-white/20 backdrop-blur-sm border-r border-black z-50 pointer-events-none"
             style={{ backgroundColor: 'rgba(255, 252, 250, 0.3)' }}
           >
+            {/* 上方圖標 */}
             <div className="flex flex-col items-center gap-4 pt-4 pointer-events-auto">
               <DesktopIcon
                 label="Memento"
@@ -210,24 +211,28 @@ export default function Home() {
                 icon="🎨"
               />
               <DesktopIcon
-                label="PhoneBook"
+                label="Phone Book"
                 onClick={() => handleOpenWindow("phonebook")}
                 icon="📞"
               />
               <DesktopIcon
-                label="EventBook"
+                label="Event Book"
                 onClick={() => handleOpenWindow("eventbook")}
                 icon="📅"
-              />
-              <DesktopIcon
-                label="About"
-                onClick={() => handleOpenWindow("about")}
-                icon="ℹ️"
               />
               <DesktopIcon
                 label="Help"
                 onClick={() => handleOpenWindow("help")}
                 icon="❓"
+              />
+            </div>
+
+            {/* 底部圖標 */}
+            <div className="absolute bottom-4 w-full pointer-events-auto">
+              <DesktopIcon
+                label="About"
+                onClick={() => handleOpenWindow("about")}
+                icon="ℹ️"
               />
             </div>
           </div>
