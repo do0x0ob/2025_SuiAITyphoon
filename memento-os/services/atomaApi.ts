@@ -1,3 +1,5 @@
+import { X25519KeyPair, generateKeyPair, deriveSharedSecret } from '@/utils/crypto';
+
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -21,33 +23,42 @@ interface ChatCompletionResponse {
   };
 }
 
+interface ConfidentialChatRequest {
+  ciphertext: string;           // base64 encoded
+  client_dh_public_key: string; // base64 encoded
+  model_name: string;
+  node_dh_public_key: string;   // base64 encoded
+  nonce: string;                // base64 encoded
+  plaintext_body_hash: string;  // base64 encoded
+  salt: string;                 // base64 encoded
+  stack_small_id: number;
+}
+
+interface ConfidentialChatResponse {
+  ciphertext: string;      // base64 encoded
+  nonce: string;          // base64 encoded
+  response_hash: string | null;
+  signature: string | null;
+  usage?: {
+    prompt_tokens: number;
+    total_tokens: number;
+    completion_tokens?: number;
+  };
+}
+
 export class AtomaApiService {
-  private readonly baseUrl: string;
-  private readonly apiKey: string;
-  private readonly defaultModel = "meta-llama/llama-3.3-70b-instruct";
+  private readonly defaultModel = "deepseek-ai/DeepSeek-R1";
 
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_ATOMA_API_URL || 'https://api.atoma.network';
-    this.apiKey = process.env.NEXT_PUBLIC_ATOMA_API_KEY || '';
-  }
-
-  async createConfidentialChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
-    const endpoint = '/v1/confidential/chat/completions';
-    const url = `${this.baseUrl}${endpoint}`;
-
-    const requestBody: ChatCompletionRequest = {
-      model: this.defaultModel,
-      messages,
-    };
-
+  async createChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
     try {
-      const response = await fetch(url, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          messages,
+        }),
       });
 
       if (!response.ok) {

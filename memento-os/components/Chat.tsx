@@ -13,22 +13,18 @@ export default function Chat() {
   
   const atomaApi = new AtomaApiService();
 
-  const handleSendMessage = async (userMessage: string) => {
-    setIsLoading(true);
-    setError(null);
-
+  const handleSendMessage = async (content: string) => {
     try {
-      const chatMessages: ChatMessage[] = [
-        { role: 'system' as const, content: 'You are a helpful assistant.' },
+      setIsLoading(true);
+      const response = await atomaApi.createChatCompletion([
         ...messages,
-        { role: 'user' as const, content: userMessage }
-      ];
+        { role: 'user', content }
+      ]);
 
-      const response = await atomaApi.createConfidentialChatCompletion(chatMessages);
-      
       if (response.choices[0]?.message) {
-        setMessages(prev => [...prev, 
-          { role: 'user', content: userMessage },
+        setMessages(prev => [
+          ...prev,
+          { role: 'user', content },
           response.choices[0].message!
         ]);
       }
