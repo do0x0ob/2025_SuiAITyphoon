@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import Window from '@/components/Window';
 import Header from '@/components/Header';
 import { retroButtonStyles } from '@/styles/components';
+import PhoneBook from '@/components/PhoneBook';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -21,7 +22,7 @@ export default function Home() {
     
     return {
       x: Math.round((window.innerWidth - width) / 2),
-      y: Math.round((window.innerHeight - height) / 2),
+      y: Math.round((window.innerHeight - height) / 2) - 60,
     };
   };
 
@@ -64,20 +65,21 @@ export default function Home() {
 
   // 修改打開窗口的處理函數
   const handleOpenWindow = (name: WindowName) => {
-    if (openWindows.includes(name)) {
-      setOpenWindows(openWindows.filter(window => window !== name));
-      if (draggingWindow === name) {
-        setDraggingWindow(null);
-      }
-    } else {
-      setOpenWindows([...openWindows, name]);
-      if (name === 'memento') {
-        const centerPosition = getCenterPosition(mementoSize.width, mementoSize.height);
-        setWindowPositions(prev => ({
-          ...prev,
-          memento: centerPosition,
-        }));
-      }
+    // 先添加到打開列表中（如果還沒打開）
+    if (!openWindows.includes(name)) {
+      setOpenWindows(current => [...current, name]);
+    }
+
+    // 無論如何都要激活窗口
+    handleWindowActivate(name);
+    
+    // 如果是 Memento 窗口，設置中心位置
+    if (name === 'memento') {
+      const centerPosition = getCenterPosition(mementoSize.width, mementoSize.height);
+      setWindowPositions(prev => ({
+        ...prev,
+        memento: centerPosition,
+      }));
     }
   };
 
@@ -195,161 +197,164 @@ export default function Home() {
         />
 
         {/* 主要內容容器 */}
-        <div 
-          className="relative w-full h-full z-10"
-        >
-          {/* 桌面圖標 */}
-          <div className="absolute top-4 right-4 flex flex-col gap-6">
-            <DesktopIcon
-              label="Memento"
-              onClick={() => handleOpenWindow("memento")}
-              icon="🎨"
-            />
-            <DesktopIcon
-              label="Phone Book"
-              onClick={() => handleOpenWindow("phonebook")}
-              icon="📞"
-            />
-            <DesktopIcon
-              label="Event Book"
-              onClick={() => handleOpenWindow("eventbook")}
-              icon="📅"
-            />
-            <DesktopIcon
-              label="About"
-              onClick={() => handleOpenWindow("about")}
-              icon="ℹ️"
-            />
-            <DesktopIcon
-              label="Help"
-              onClick={() => handleOpenWindow("help")}
-              icon="❓"
-            />
+        <div className="relative w-full h-full z-10">
+          {/* 左側面板 */}
+          <div 
+            className="fixed left-0 top-6 bottom-0 w-16 bg-white/20 backdrop-blur-sm border-r border-black/20 z-50 pointer-events-none"
+            style={{ backgroundColor: 'rgba(255, 252, 250, 0.3)' }}
+          >
+            <div className="flex flex-col items-center gap-4 pt-4 pointer-events-auto">
+              <DesktopIcon
+                label="Memento"
+                onClick={() => handleOpenWindow('memento')}
+                icon="🎨"
+              />
+              <DesktopIcon
+                label="PhoneBook"
+                onClick={() => handleOpenWindow("phonebook")}
+                icon="📞"
+              />
+              <DesktopIcon
+                label="EventBook"
+                onClick={() => handleOpenWindow("eventbook")}
+                icon="📅"
+              />
+              <DesktopIcon
+                label="About"
+                onClick={() => handleOpenWindow("about")}
+                icon="ℹ️"
+              />
+              <DesktopIcon
+                label="Help"
+                onClick={() => handleOpenWindow("help")}
+                icon="❓"
+              />
+            </div>
           </div>
 
-          {/* 修改窗口渲染邏輯，根據 openWindows 的順序渲染 */}
-          {openWindows.map(name => {
-            switch(name) {
-              case 'memento':
-                return (
-                  <Window
-                    key={name}
-                    name={name}
-                    title="Memento"
-                    position={windowPositions.memento}
-                    size={windowSizes.memento}
-                    isActive={activeWindow === 'memento'}
-                    resizable={false}
-                    onClose={(name: WindowName) => handleCloseWindow(name)}
-                    onDragStart={(e: React.MouseEvent<Element>, name: WindowName) => handleDragStart(e, name)}
-                    onClick={() => handleWindowActivate('memento')}
-                  >
-                    <div className="p-4 h-full flex flex-col justify-between">
-                      <div className="flex justify-center items-center flex-1">
-                        <img 
-                          src="/images/memento.png" 
-                          alt="Memento"
-                          className="w-[90%] h-auto memento-image"
-                        />
+          {/* 主要內容區域 - 添加左側 padding 來為面板留出空間 */}
+          <div className="pl-16 h-full relative">
+            {/* 窗口渲染邏輯，根據 openWindows 的順序渲染 */}
+            {openWindows.map(name => {
+              switch(name) {
+                case 'memento':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Memento"
+                      position={windowPositions.memento}
+                      size={windowSizes.memento}
+                      isActive={activeWindow === 'memento'}
+                      resizable={false}
+                      onClose={(name: WindowName) => handleCloseWindow(name)}
+                      onDragStart={(e: React.MouseEvent<Element>, name: WindowName) => handleDragStart(e, name)}
+                      onClick={() => handleWindowActivate('memento')}
+                    >
+                      <div className="p-4 h-full flex flex-col justify-between">
+                        <div className="flex justify-center items-center flex-1">
+                          <img 
+                            src="/images/memento.png" 
+                            alt="Memento"
+                            className="w-[90%] h-auto memento-image"
+                          />
+                        </div>
+                        <div className="flex justify-center mt-4">
+                          <ConnectButton 
+                            style={retroButtonStyles.button} 
+                            onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
+                            onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
+                            connectText="Connect Wallet"
+                            className="retro-button"
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-center mt-4">
-                        <ConnectButton 
-                          style={retroButtonStyles.button} 
-                          onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
-                          onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
-                          connectText="Connect Wallet"
-                          className="retro-button"
-                        />
+                    </Window>
+                  );
+                case 'phonebook':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="PhoneBook"
+                      position={windowPositions.phonebook}
+                      size={windowSizes.phonebook}
+                      isActive={activeWindow === 'phonebook'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('phonebook')}
+                    >
+                      <PhoneBook />
+                    </Window>
+                  );
+                case 'eventbook':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="EventBook"
+                      position={windowPositions.eventbook}
+                      size={windowSizes.eventbook}
+                      isActive={activeWindow === 'eventbook'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('eventbook')}
+                    >
+                      <div className="p-4">
+                        <h2 className="text-xl font-medium mb-4">Event Book</h2>
+                        {/* Event Book 內容 */}
                       </div>
-                    </div>
-                  </Window>
-                );
-              case 'phonebook':
-                return (
-                  <Window
-                    key={name}
-                    name={name}
-                    title="Phone Book"
-                    position={windowPositions.phonebook}
-                    size={windowSizes.phonebook}
-                    isActive={activeWindow === 'phonebook'}
-                    resizable={true}
-                    onClose={handleCloseWindow}
-                    onDragStart={handleDragStart}
-                    onResize={handleResize}
-                    onClick={() => handleWindowActivate('phonebook')}
-                  >
-                    <div className="p-4">
-                      <h2 className="text-xl font-medium mb-4">Phone Book</h2>
-                      {/* Phone Book 內容 */}
-                    </div>
-                  </Window>
-                );
-              case 'eventbook':
-                return (
-                  <Window
-                    key={name}
-                    name={name}
-                    title="Event Book"
-                    position={windowPositions.eventbook}
-                    size={windowSizes.eventbook}
-                    isActive={activeWindow === 'eventbook'}
-                    resizable={true}
-                    onClose={handleCloseWindow}
-                    onDragStart={handleDragStart}
-                    onResize={handleResize}
-                    onClick={() => handleWindowActivate('eventbook')}
-                  >
-                    <div className="p-4">
-                      <h2 className="text-xl font-medium mb-4">Event Book</h2>
-                      {/* Event Book 內容 */}
-                    </div>
-                  </Window>
-                );
-              case 'about':
-                return (
-                  <Window
-                    key={name}
-                    name={name}
-                    title="About"
-                    position={windowPositions.about}
-                    size={windowSizes.about}
-                    isActive={activeWindow === 'about'}
-                    resizable={true}
-                    onClose={handleCloseWindow}
-                    onDragStart={handleDragStart}
-                    onResize={handleResize}
-                    onClick={() => handleWindowActivate('about')}
-                  >
-                    <div className="p-4">
-                      <h2 className="text-xl font-medium mb-4">About Memento OS</h2>
-                      <p className="text-gray-800">A web3 operating system for the modern age.</p>
-                    </div>
-                  </Window>
-                );
-              case 'help':
-                return (
-                  <Window
-                    key={name}
-                    name={name}
-                    title="Help"
-                    position={windowPositions.help}
-                    size={windowSizes.help}
-                    isActive={activeWindow === 'help'}
-                    resizable={true}
-                    onClose={handleCloseWindow}
-                    onDragStart={handleDragStart}
-                    onResize={handleResize}
-                    onClick={() => handleWindowActivate('help')}
-                  >
-                    <div className="p-4">
-                      <h2 className="text-xl font-medium mb-4">Help</h2>
-                      {/* Help 內容 */}
-                    </div>
-                  </Window>
-                );
-            }
-          })}
+                    </Window>
+                  );
+                case 'about':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="About"
+                      position={windowPositions.about}
+                      size={windowSizes.about}
+                      isActive={activeWindow === 'about'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('about')}
+                    >
+                      <div className="p-4">
+                        <h2 className="text-xl font-medium mb-4">About Memento OS</h2>
+                        <p className="text-gray-800">A web3 operating system for the modern age.</p>
+                      </div>
+                    </Window>
+                  );
+                case 'help':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Help"
+                      position={windowPositions.help}
+                      size={windowSizes.help}
+                      isActive={activeWindow === 'help'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('help')}
+                    >
+                      <div className="p-4">
+                        <h2 className="text-xl font-medium mb-4">Help</h2>
+                        {/* Help 內容 */}
+                      </div>
+                    </Window>
+                  );
+              }
+            })}
+          </div>
         </div>
       </div>
     </>

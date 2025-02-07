@@ -1,0 +1,1 @@
+export type WindowName = 'memento' | 'phonebook' | 'eventbook' | 'about' | 'help'; 

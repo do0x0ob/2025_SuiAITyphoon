@@ -68,7 +68,6 @@ const Window: React.FC<WindowProps> = ({
           lineHeight: '24px',
         }}
         onMouseDown={(e) => {
-          // 如果點擊的是關閉按鈕，不觸發拖動
           if ((e.target as HTMLElement).tagName === 'BUTTON') {
             return;
           }

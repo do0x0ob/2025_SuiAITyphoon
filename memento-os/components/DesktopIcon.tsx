@@ -4,34 +4,34 @@ import Image from 'next/image';
 interface DesktopIconProps {
   label: string;
   onClick: () => void;
-  icon: string | React.ReactNode;  // 可以是圖片路徑或 React 組件
-  iconType?: 'image' | 'component' | 'emoji';  // 指定 icon 的類型
+  icon: string;
 }
 
-const DesktopIcon: React.FC<DesktopIconProps> = ({ 
-  label, 
-  onClick, 
-  icon, 
-  iconType = 'emoji' 
-}) => {
+const DesktopIcon = ({ label, onClick, icon }: DesktopIconProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('DesktopIcon clicked:', label); // 添加日誌
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
     <div
-      className="flex flex-col items-center gap-1 cursor-pointer p-2"
-      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick(e as unknown as React.MouseEvent)}
+      className="group flex flex-col items-center w-full px-2 py-1 hover:bg-black/5 relative cursor-pointer"
     >
-      {iconType === 'emoji' ? (
-        <div className="text-2xl">{icon}</div>
-      ) : iconType === 'image' ? (
-        <Image
-          src={icon as string}
-          alt={label}
-          width={32}
-          height={32}
-        />
-      ) : (
-        <span className="text-2xl text-white">{icon}</span>
-      )}
-      <span className="text-xs font-mono text-gray-800 font-medium">
+      <span className="text-3xl select-none">{icon}</span>
+      <span 
+        className="text-[8px] font-mono text-center text-black/80 whitespace-nowrap mt-0.5 select-none"
+        style={{ 
+          maxWidth: '100%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
         {label}
       </span>
     </div>
