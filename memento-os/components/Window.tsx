@@ -63,25 +63,31 @@ const Window: React.FC<WindowProps> = ({
         style={{
           borderBottom: '1px solid rgba(0, 0, 0, 0.8)',
           backgroundColor: 'rgba(255, 252, 250, 0.85)',
-          height: '24px',  // 確保所有窗口的 header 高度一致
+          height: '24px',
           minHeight: '24px',
-          lineHeight: '24px',  // 添加行高以確保文字垂直居中
+          lineHeight: '24px',
         }}
-        onMouseDown={(e) => onDragStart(e, name)}
+        onMouseDown={(e) => {
+          // 如果點擊的是關閉按鈕，不觸發拖動
+          if ((e.target as HTMLElement).tagName === 'BUTTON') {
+            return;
+          }
+          onDragStart(e, name);
+        }}
       >
         <button
           onClick={(e) => {
-            e.stopPropagation();
+            e.stopPropagation();  // 阻止事件冒泡
             onClose(name);
           }}
-          className="px-2 py-0 text-sm font-bold text-gray-900 hover:text-black leading-none ml-1"
-          style={{ height: '24px', lineHeight: '24px' }}  // 確保按鈕高度一致
+          className="px-2 py-0 text-sm font-bold text-gray-900 hover:text-black leading-none ml-1 cursor-pointer"
+          style={{ height: '24px', lineHeight: '24px' }}
         >
           ✕
         </button>
         <span 
           className="text-sm font-mono font-bold text-gray-900 uppercase tracking-wider leading-none absolute right-2"
-          style={{ lineHeight: '24px' }}  // 確保標題文字垂直居中
+          style={{ lineHeight: '24px' }}
         >
           {title}
         </span>
@@ -90,7 +96,10 @@ const Window: React.FC<WindowProps> = ({
       {/* 窗口內容 */}
       <div 
         className="text-gray-800 h-full"
-        style={bgStyle}
+        style={{ 
+          ...bgStyle,
+          paddingBottom: '1rem'  // 減少底部 padding
+        }}
       >
         {children}
       </div>

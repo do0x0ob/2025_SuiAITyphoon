@@ -108,24 +108,16 @@ export default function Home() {
     const handleMouseMove = (e: MouseEvent) => {
       const windowWidth = windowSizes[windowName].width;
       const windowHeight = windowSizes[windowName].height;
-      
       const newX = Math.max(0, Math.min(e.clientX - offsetX, window.innerWidth - windowWidth));
       const newY = Math.max(0, Math.min(e.clientY - offsetY, window.innerHeight - windowHeight));
-
-      setWindowPositions(prev => ({
-        ...prev,
-        [windowName]: { x: newX, y: newY }
-      }));
-    };
-
-    const handleMouseUp = () => {
-      setDraggingWindow(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      setWindowPositions(prev => ({...prev, [windowName]: { x: newX, y: newY }}));
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', () => {
+      setDraggingWindow(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+    });
   };
 
   // 處理窗口縮放
