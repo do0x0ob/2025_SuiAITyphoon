@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { ConnectButton } from '@mysten/dapp-kit';
-import '@mysten/dapp-kit/dist/index.css';
-import Window from '@/components/Window';
 import type { WindowName } from '../types';
+import '@mysten/dapp-kit/dist/index.css';
+import dynamic from 'next/dynamic';
+import Window from '@/components/Window';
+import Header from '@/components/Header';
+import { retroButtonStyles } from '@/styles/components';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -25,19 +27,24 @@ export default function Home() {
 
   // 修改 Memento 窗口的默認尺寸為 600x600
   const mementoSize = { width: 600, height: 600 };
+  const defaultSize = { width: 500, height: 400 };
 
   const [openWindows, setOpenWindows] = useState<string[]>(['memento']);
   const [activeWindow, setActiveWindow] = useState<string>('memento');  // 新增：追蹤當前活動窗口
   const [draggingWindow, setDraggingWindow] = useState<string | null>(null);
   const [windowPositions, setWindowPositions] = useState({
-    memento: { x: 0, y: 0 },  // 初始值設為 0，後面會更新
-    about: { x: 150, y: 150 },
-    files: { x: 200, y: 200 },
+    memento: { x: 0, y: 0 },
+    phonebook: { x: 150, y: 150 },
+    eventbook: { x: 200, y: 200 },
+    about: { x: 250, y: 250 },
+    help: { x: 300, y: 300 },
   });
   const [windowSizes, setWindowSizes] = useState({
     memento: mementoSize,
-    about: { width: 400, height: 300 },
-    files: { width: 500, height: 400 },
+    phonebook: defaultSize,
+    eventbook: defaultSize,
+    about: defaultSize,
+    help: defaultSize,
   });
 
   // 使用 useEffect 來設置 Memento 窗口的初始位置
@@ -175,146 +182,200 @@ export default function Home() {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      {/* 基礎背景 - 更淺的粉色 */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundColor: '#FFF5F5',
-        }}
-      />
+    <>
+      <Header />
+      <div className="relative w-full h-screen overflow-hidden pt-6 pb-6">  {/* 添加 padding 來為 header 和 footer 留出空間 */}
+        {/* 基礎背景 - 更淺的粉色 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundColor: '#FFF5F5',
+          }}
+        />
 
-      {/* 漸層效果 */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(rgba(255, 228, 230, 0.4), rgba(255, 228, 230, 0.4))',
-        }}
-      />
+        {/* 漸層效果 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(rgba(255, 228, 230, 0.4), rgba(255, 228, 230, 0.4))',
+          }}
+        />
 
-      {/* 主要顆粒效果 */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: 'url("/grain.svg")',
-          backgroundRepeat: 'repeat',
-          backgroundSize: '120px 120px',
-          opacity: 0.7,
-          mixBlendMode: 'soft-light',
-        }}
-      />
+        {/* 主要顆粒效果 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url("/grain.svg")',
+            backgroundRepeat: 'repeat',
+            backgroundSize: '120px 120px',
+            opacity: 0.7,
+            mixBlendMode: 'soft-light',
+          }}
+        />
 
-      {/* 第二層顆粒效果 */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundImage: 'url("/grain.svg")',
-          backgroundRepeat: 'repeat',
-          backgroundSize: '80px 80px',
-          opacity: 0.4,
-          mixBlendMode: 'multiply',
-        }}
-      />
+        {/* 第二層顆粒效果 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url("/grain.svg")',
+            backgroundRepeat: 'repeat',
+            backgroundSize: '80px 80px',
+            opacity: 0.4,
+            mixBlendMode: 'multiply',
+          }}
+        />
 
-      {/* 主要內容容器 */}
-      <div 
-        className="relative w-full h-full z-10"
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-      >
-        {/* 桌面圖標 */}
-        <div className="absolute top-4 right-4 flex flex-col gap-6">
-          <DesktopIcon
-            label="Memento"
-            onClick={() => handleOpenWindow("memento")}
-            icon="🎨"
-          />
-          <DesktopIcon
-            label="About"
-            onClick={() => handleOpenWindow("about")}
-            icon="ℹ️"
-          />
-          <DesktopIcon
-            label="Files"
-            onClick={() => handleOpenWindow("files")}
-            icon="📁"
-          />
-        </div>
+        {/* 主要內容容器 */}
+        <div 
+          className="relative w-full h-full z-10"
+          onMouseMove={handleDragMove}
+          onMouseUp={handleDragEnd}
+        >
+          {/* 桌面圖標 */}
+          <div className="absolute top-4 right-4 flex flex-col gap-6">
+            <DesktopIcon
+              label="Memento"
+              onClick={() => handleOpenWindow("memento")}
+              icon="🎨"
+            />
+            <DesktopIcon
+              label="Phone Book"
+              onClick={() => handleOpenWindow("phonebook")}
+              icon="📞"
+            />
+            <DesktopIcon
+              label="Event Book"
+              onClick={() => handleOpenWindow("eventbook")}
+              icon="📅"
+            />
+            <DesktopIcon
+              label="About"
+              onClick={() => handleOpenWindow("about")}
+              icon="ℹ️"
+            />
+            <DesktopIcon
+              label="Help"
+              onClick={() => handleOpenWindow("help")}
+              icon="❓"
+            />
+          </div>
 
-        {/* 修改窗口渲染邏輯，根據 openWindows 的順序渲染 */}
-        {openWindows.map(name => {
-          switch(name) {
-            case 'memento':
-              return (
-                <Window
-                  key={name}
-                  name={name}
-                  title="Memento"
-                  position={windowPositions.memento}
-                  size={windowSizes.memento}
-                  isActive={activeWindow === 'memento'}
-                  resizable={false}
-                  onClose={handleCloseWindow}
-                  onDragStart={handleDragStart}
-                  onClick={() => handleWindowActivate('memento')}  // 新增：點擊事件
-                >
-                  <div className="p-4">
-                    <ConnectButton />
-                  </div>
-                </Window>
-              );
-            case 'about':
-              return (
-                <Window
-                  key={name}
-                  name={name}
-                  title="About"
-                  position={windowPositions.about}
-                  size={windowSizes.about}
-                  isActive={activeWindow === 'about'}
-                  resizable={false}
-                  onClose={handleCloseWindow}
-                  onDragStart={handleDragStart}
-                  onClick={() => handleWindowActivate('about')}  // 新增：點擊事件
-                >
-                  <div className="p-4">
-                    <h2 className="text-xl font-medium text-gray-900 mb-4">About Memento OS</h2>
-                    <p className="text-gray-800">A web3 operating system for the modern age.</p>
-                  </div>
-                </Window>
-              );
-            case 'files':
-              return (
-                <Window
-                  key={name}
-                  name={name}
-                  title="Files"
-                  position={windowPositions.files}
-                  size={windowSizes.files}
-                  isActive={activeWindow === 'files'}
-                  resizable={true}
-                  onClose={handleCloseWindow}
-                  onDragStart={handleDragStart}
-                  onResize={handleResize}
-                  onClick={() => handleWindowActivate('files')}  // 新增：點擊事件
-                >
-                  <div className="p-4">
-                    <div className="grid grid-cols-4 gap-4">
-                      <div className="flex flex-col items-center p-2 hover:bg-black/5 cursor-pointer">
-                        <span className="text-2xl">📄</span>
-                        <span className="text-xs mt-1">Document.txt</span>
-                      </div>
-                      <div className="flex flex-col items-center p-2 hover:bg-black/5 cursor-pointer">
-                        <span className="text-2xl">📁</span>
-                        <span className="text-xs mt-1">Projects</span>
-                      </div>
+          {/* 修改窗口渲染邏輯，根據 openWindows 的順序渲染 */}
+          {openWindows.map(name => {
+            switch(name) {
+              case 'memento':
+                return (
+                  <Window
+                    key={name}
+                    name={name}
+                    title="Memento"
+                    position={windowPositions.memento}
+                    size={windowSizes.memento}
+                    isActive={activeWindow === 'memento'}
+                    resizable={false}
+                    onClose={handleCloseWindow}
+                    onDragStart={handleDragStart}
+                    onClick={() => handleWindowActivate('memento')}
+                  >
+                    <div className="p-4">
+                      <ConnectButton 
+                        style={retroButtonStyles.button} 
+                        onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
+                        onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
+                        connectText="Connect Wallet"
+                        className="retro-button"
+                      />
                     </div>
-                  </div>
-                </Window>
-              );
-          }
-        })}
+                  </Window>
+                );
+              case 'phonebook':
+                return (
+                  <Window
+                    key={name}
+                    name={name}
+                    title="Phone Book"
+                    position={windowPositions.phonebook}
+                    size={windowSizes.phonebook}
+                    isActive={activeWindow === 'phonebook'}
+                    resizable={true}
+                    onClose={handleCloseWindow}
+                    onDragStart={handleDragStart}
+                    onResize={handleResize}
+                    onClick={() => handleWindowActivate('phonebook')}
+                  >
+                    <div className="p-4">
+                      <h2 className="text-xl font-medium mb-4">Phone Book</h2>
+                      {/* Phone Book 內容 */}
+                    </div>
+                  </Window>
+                );
+              case 'eventbook':
+                return (
+                  <Window
+                    key={name}
+                    name={name}
+                    title="Event Book"
+                    position={windowPositions.eventbook}
+                    size={windowSizes.eventbook}
+                    isActive={activeWindow === 'eventbook'}
+                    resizable={true}
+                    onClose={handleCloseWindow}
+                    onDragStart={handleDragStart}
+                    onResize={handleResize}
+                    onClick={() => handleWindowActivate('eventbook')}
+                  >
+                    <div className="p-4">
+                      <h2 className="text-xl font-medium mb-4">Event Book</h2>
+                      {/* Event Book 內容 */}
+                    </div>
+                  </Window>
+                );
+              case 'about':
+                return (
+                  <Window
+                    key={name}
+                    name={name}
+                    title="About"
+                    position={windowPositions.about}
+                    size={windowSizes.about}
+                    isActive={activeWindow === 'about'}
+                    resizable={true}
+                    onClose={handleCloseWindow}
+                    onDragStart={handleDragStart}
+                    onResize={handleResize}
+                    onClick={() => handleWindowActivate('about')}
+                  >
+                    <div className="p-4">
+                      <h2 className="text-xl font-medium mb-4">About Memento OS</h2>
+                      <p className="text-gray-800">A web3 operating system for the modern age.</p>
+                    </div>
+                  </Window>
+                );
+              case 'help':
+                return (
+                  <Window
+                    key={name}
+                    name={name}
+                    title="Help"
+                    position={windowPositions.help}
+                    size={windowSizes.help}
+                    isActive={activeWindow === 'help'}
+                    resizable={true}
+                    onClose={handleCloseWindow}
+                    onDragStart={handleDragStart}
+                    onResize={handleResize}
+                    onClick={() => handleWindowActivate('help')}
+                  >
+                    <div className="p-4">
+                      <h2 className="text-xl font-medium mb-4">Help</h2>
+                      {/* Help 內容 */}
+                    </div>
+                  </Window>
+                );
+            }
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
