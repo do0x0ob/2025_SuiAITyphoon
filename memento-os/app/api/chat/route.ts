@@ -29,9 +29,9 @@ export async function POST(req: Request) {
       }),
     });
 
-    console.log('API Response Status:', response.status);  // 添加日誌
+    console.log('API Response Status:', response.status);
     const data = await response.json();
-    console.log('API Response Data:', data);  // 添加日誌
+    console.log('API Response Data:', data);
 
     return NextResponse.json(data);
   } catch (error) {
