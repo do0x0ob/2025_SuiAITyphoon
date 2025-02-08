@@ -10,6 +10,8 @@ import Header from '@/components/Header';
 import { retroButtonStyles } from '@/styles/components';
 import PhoneBook from '@/components/PhoneBook';
 import { ASCII_ART } from '@/constants/ascii';
+import WalrusUpload from '@/components/WalrusUpload';
+import WalrusView from '@/components/WalrusView';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -41,13 +43,17 @@ export default function Home() {
     eventbook: { x: 200, y: 200 },
     about: { x: 250, y: 250 },
     help: { x: 300, y: 300 },
+    walrusupload: { x: 350, y: 350 },
+    walrusview: { x: 400, y: 400 },
   });
   const [windowSizes, setWindowSizes] = useState({
     memento: mementoSize,
     phonebook: defaultSize,
     eventbook: defaultSize,
-    about: aboutSize,     // 使用新的尺寸
+    about: aboutSize,
     help: defaultSize,
+    walrusupload: defaultSize,
+    walrusview: defaultSize,
   });
 
   // 使用 useEffect 來設置 Memento 窗口的初始位置
@@ -100,21 +106,21 @@ export default function Home() {
   };
 
   // 修改拖動開始的處理函數
-  const handleDragStart = (e: React.MouseEvent<Element>, windowName: WindowName) => {
+  const handleDragStart = (e: React.MouseEvent<Element>, windowName: string) => {
     e.preventDefault();
-    handleWindowActivate(windowName);
-    setDraggingWindow(windowName);
+    handleWindowActivate(windowName as WindowName);
+    setDraggingWindow(windowName as WindowName);
     
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const offsetX = e.clientX - rect.left;
     const offsetY = e.clientY - rect.top;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const windowWidth = windowSizes[windowName].width;
-      const windowHeight = windowSizes[windowName].height;
+      const windowWidth = windowSizes[windowName as WindowName].width;
+      const windowHeight = windowSizes[windowName as WindowName].height;
       const newX = Math.max(0, Math.min(e.clientX - offsetX, window.innerWidth - windowWidth));
       const newY = Math.max(0, Math.min(e.clientY - offsetY, window.innerHeight - windowHeight));
-      setWindowPositions(prev => ({...prev, [windowName]: { x: newX, y: newY }}));
+      setWindowPositions(prev => ({...prev, [windowName as WindowName]: { x: newX, y: newY }}));
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -227,6 +233,16 @@ export default function Home() {
                 onClick={() => handleOpenWindow("help")}
                 icon="❓"
               />
+              <DesktopIcon
+                label="Upload"
+                onClick={() => handleOpenWindow("walrusupload")}
+                icon="📤"
+              />
+              <DesktopIcon
+                label="View"
+                onClick={() => handleOpenWindow("walrusview")}
+                icon="📥"
+              />
             </div>
 
             {/* 底部圖標 */}
@@ -255,18 +271,11 @@ export default function Home() {
                       isActive={activeWindow === 'memento'}
                       resizable={false}
                       onClose={(name: WindowName) => handleCloseWindow(name)}
-                      onDragStart={(e: React.MouseEvent<Element>, name: WindowName) => handleDragStart(e, name)}
+                      onDragStart={(e: React.MouseEvent<Element>, name: string) => handleDragStart(e, name)}
                       onClick={() => handleWindowActivate('memento')}
                     >
-                      <div className="p-4 h-full flex flex-col justify-between">
-                        <div className="flex justify-center items-center flex-1">
-                          <img 
-                            src="/images/memento.png" 
-                            alt="Memento"
-                            className="w-[90%] h-auto memento-image"
-                          />
-                        </div>
-                        <div className="flex justify-center mt-4">
+                      <div className="p-4 h-full">
+                        <div className="flex justify-center mb-6">
                           <ConnectButton 
                             style={retroButtonStyles.button} 
                             onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
@@ -274,6 +283,11 @@ export default function Home() {
                             connectText="Connect Wallet"
                             className="retro-button"
                           />
+                        </div>
+                        <div className="flex items-center justify-center h-[calc(100%-60px)]">
+                          <p className="text-lg font-mono text-center text-black/80">
+                            Welcome to Memento OS
+                          </p>
                         </div>
                       </div>
                     </Window>
@@ -362,6 +376,42 @@ export default function Home() {
                         <h2 className="text-xl font-medium mb-4">Help</h2>
                         {/* Help 內容 */}
                       </div>
+                    </Window>
+                  );
+                case 'walrusupload':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Walrus Upload"
+                      position={windowPositions.walrusupload}
+                      size={windowSizes.walrusupload}
+                      isActive={activeWindow === 'walrusupload'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('walrusupload')}
+                    >
+                      <WalrusUpload />
+                    </Window>
+                  );
+                case 'walrusview':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Walrus View"
+                      position={windowPositions.walrusview}
+                      size={windowSizes.walrusview}
+                      isActive={activeWindow === 'walrusview'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('walrusview')}
+                    >
+                      <WalrusView />
                     </Window>
                   );
               }
