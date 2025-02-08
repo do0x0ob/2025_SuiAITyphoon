@@ -51,16 +51,16 @@ export class AtomaApiService {
   private readonly apiKey: string;
 
   constructor() {
-    // 根據環境選擇正確的 API URL
-    this.baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://api.atoma.network'  // 生產環境直接使用 Atoma API
-      : '/api/chat';  // 開發環境使用本地代理
+    this.baseUrl = 'https://api.atoma.network';
     this.apiKey = process.env.NEXT_PUBLIC_ATOMA_API_KEY || '';
   }
 
   async createChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
+    const endpoint = '/v1/chat/completions';
+    const url = `${this.baseUrl}${endpoint}`;
+
     try {
-      const response = await fetch(this.baseUrl, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
