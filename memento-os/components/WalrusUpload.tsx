@@ -31,7 +31,7 @@ export default function WalrusUpload() {
       }
 
       const result = await response.json();
-      setResponse(result.newlyCreated.blobObject.blobId);
+      setResponse(JSON.stringify(result, null, 2));
     } catch (error) {
       setResponse(error instanceof Error ? error.message : 'Upload failed');
     } finally {
