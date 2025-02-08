@@ -52,7 +52,7 @@ export default function WalrusUpload() {
           disabled={!file || isLoading}
           className="px-4 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          Upload
+          {isLoading ? 'Uploading...' : 'Upload'}
         </button>
       </div>
       <div className="flex-1 overflow-auto">
