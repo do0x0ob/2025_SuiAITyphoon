@@ -9,9 +9,9 @@ import Window from '@/components/Window';
 import Header from '@/components/Header';
 import { retroButtonStyles } from '@/styles/components';
 import PhoneBook from '@/components/PhoneBook';
-import { ASCII_ART } from '@/constants/ascii';
 import WalrusUpload from '@/components/WalrusUpload';
 import WalrusView from '@/components/WalrusView';
+import AboutContent from '@/components/AboutContent';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -29,10 +29,9 @@ export default function Home() {
     };
   };
 
-  // 修改 Memento 窗口的默認尺寸為 600x600
   const mementoSize = { width: 600, height: 600 };
   const defaultSize = { width: 500, height: 400 };
-  const aboutSize = { width: 540, height: 400 };  // About 窗口的專門尺寸
+  const aboutSize = { width: 540, height: 700 };
 
   const [openWindows, setOpenWindows] = useState<WindowName[]>(['memento']);
   const [activeWindow, setActiveWindow] = useState<WindowName | null>('memento');
@@ -41,7 +40,7 @@ export default function Home() {
     memento: { x: 0, y: 0 },
     phonebook: { x: 150, y: 150 },
     eventbook: { x: 200, y: 200 },
-    about: { x: 250, y: 250 },
+    about: { x: 300, y: 100 },
     help: { x: 300, y: 300 },
     walrusupload: { x: 350, y: 350 },
     walrusview: { x: 400, y: 400 },
@@ -346,15 +345,7 @@ export default function Home() {
                       onResize={handleResize}
                       onClick={() => handleWindowActivate('about')}
                     >
-                      <div className="p-4">
-                        <pre className="text-[0.6rem] leading-[1.15] font-mono mb-4 select-none">
-                          {ASCII_ART.MEMENTO_OS}
-                        </pre>
-                        <p className="text-gray-800">{ASCII_ART.ABOUT}</p>
-                        <pre className="text-[0.6rem] leading-[1.15] font-mono mb-4 select-none">
-                          {'\n' + ASCII_ART.AUTHOR_2}
-                        </pre>
-                      </div>
+                      <AboutContent />
                     </Window>
                   );
                 case 'help':
