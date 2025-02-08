@@ -2,28 +2,46 @@ import { useState, useEffect } from 'react';
 
 export default function WalrusView() {
   const [blobId, setBlobId] = useState('');
-  const [response, setResponse] = useState<string>('');
+  const [blobUrl, setBlobUrl] = useState<string>('');
   const [contentType, setContentType] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
+  // 清理之前的 blob URL
+  useEffect(() => {
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [blobUrl]);
+
   const handleFetch = async () => {
     if (!blobId.trim()) return;
+
+    // 清理之前的 blob URL
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      setBlobUrl('');
+    }
 
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch(`/api/walrus/${encodeURIComponent(blobId)}`);
+      // 清理 blobId，移除可能的 URL 部分
+      const cleanBlobId = blobId.split('/').pop()?.replace('blob:', '') || blobId;
+      const response = await fetch(`/api/walrus/blob/${cleanBlobId}`);
       
       if (!response.ok) {
         throw new Error(`Fetch failed: ${response.status}`);
       }
 
-      // 創建 blob URL 來顯示圖片
+      const type = response.headers.get('Content-Type') || 'application/octet-stream';
+      setContentType(type);
+
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      setResponse(url);
-      setContentType('image/jpeg');  // 或根據實際情況設置
+      setBlobUrl(url);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Fetch failed');
     } finally {
@@ -54,18 +72,6 @@ export default function WalrusView() {
     return lines.join('\n');
   };
 
-  // 清理 blob URL
-  const cleanupBlobUrl = () => {
-    if (response && contentType && (contentType.includes('image/') || contentType.includes('svga87'))) {
-      URL.revokeObjectURL(response);
-    }
-  };
-
-  // 組件卸載時清理
-  useEffect(() => {
-    return () => cleanupBlobUrl();
-  }, []);
-
   return (
     <div className="flex flex-col h-full p-4">
       <div className="flex gap-4 mb-4">
@@ -81,32 +87,24 @@ export default function WalrusView() {
           disabled={!blobId.trim() || isLoading}
           className="px-4 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          Fetch
+          {isLoading ? 'Loading...' : 'Fetch'}
         </button>
       </div>
       <div className="flex-1 overflow-auto">
         {error ? (
           <div className="text-red-500 p-3">{error}</div>
-        ) : contentType.includes('image/') ? (
+        ) : isLoading ? (
+          <div className="p-3">Loading...</div>
+        ) : blobUrl ? (
           <img 
-            src={response} 
+            src={blobUrl} 
             alt="Blob content"
             className="max-w-full h-auto"
           />
-        ) : contentType.includes('svga87') ? (
-          <div className="relative w-full h-full">
-            <object
-              data={response}
-              type="image/svg+xml"
-              className="w-full h-full"
-            >
-              SVG not supported
-            </object>
-          </div>
         ) : (
-          <pre className="p-3 bg-black/5 font-mono text-sm whitespace-pre-wrap">
-            {response || 'Response will appear here...'}
-          </pre>
+          <div className="p-3 text-gray-500">
+            Enter a blob ID and click Fetch to view content
+          </div>
         )}
       </div>
     </div>
