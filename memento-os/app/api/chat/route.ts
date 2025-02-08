@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
+    const baseUrl = process.env.ATOMA_API_URL;
     const body = await req.json();
-    const response = await fetch('https://api.atoma.network/v1/chat/completions', {
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
