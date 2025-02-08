@@ -7,7 +7,6 @@ export default function WalrusView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
-  // 清理之前的 blob URL
   useEffect(() => {
     return () => {
       if (blobUrl) {
@@ -19,7 +18,7 @@ export default function WalrusView() {
   const handleFetch = async () => {
     if (!blobId.trim()) return;
 
-    // 清理之前的 blob URL
+
     if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
       setBlobUrl('');
@@ -28,7 +27,6 @@ export default function WalrusView() {
     setIsLoading(true);
     setError('');
     try {
-      // 清理 blobId，移除可能的 URL 部分
       const cleanBlobId = blobId.split('/').pop()?.replace('blob:', '') || blobId;
       const response = await fetch(`/api/walrus/blob/${cleanBlobId}`);
       
@@ -47,29 +45,6 @@ export default function WalrusView() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // 格式化十六進制轉儲
-  const formatHexDump = (hex: string) => {
-    const bytes = hex.split(' ');
-    const lines = [];
-    const bytesPerLine = 16;
-
-    for (let i = 0; i < bytes.length; i += bytesPerLine) {
-      const lineBytes = bytes.slice(i, i + bytesPerLine);
-      const address = i.toString(16).padStart(8, '0');
-      const hexPart = lineBytes.join(' ').padEnd(bytesPerLine * 3 - 1, ' ');
-      const asciiPart = lineBytes
-        .map(byte => {
-          const code = parseInt(byte, 16);
-          return code >= 32 && code <= 126 ? String.fromCharCode(code) : '.';
-        })
-        .join('');
-
-      lines.push(`${address}  ${hexPart}  |${asciiPart}|`);
-    }
-
-    return lines.join('\n');
   };
 
   return (
