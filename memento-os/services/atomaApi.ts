@@ -47,14 +47,24 @@ interface ConfidentialChatResponse {
 }
 
 export class AtomaApiService {
-  private readonly defaultModel = "deepseek-ai/DeepSeek-R1";
+  private readonly baseUrl: string;
+  private readonly apiKey: string;
+
+  constructor() {
+    // 根據環境選擇正確的 API URL
+    this.baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api.atoma.network'  // 生產環境直接使用 Atoma API
+      : '/api/chat';  // 開發環境使用本地代理
+    this.apiKey = process.env.NEXT_PUBLIC_ATOMA_API_KEY || '';
+  }
 
   async createChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
           messages,
