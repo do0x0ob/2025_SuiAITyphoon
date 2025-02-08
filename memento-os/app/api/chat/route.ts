@@ -7,10 +7,10 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 7uabXiOonc28sJAussfv90cIeiJkPi',  // 暫時寫死用於測試
+        'Authorization': `Bearer ${process.env.ATOMA_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-R1",
+        model: "meta-llama/Llama-3.3-70B-Instruct",
         messages: body.messages,
       }),
     });

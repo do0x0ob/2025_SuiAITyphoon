@@ -12,7 +12,8 @@ module mosaicmint::utils {
         let mut encoding = vector::tabulate!(size, |_| 0);
         let mut high = size - 1;
 
-        source.length().do!(|j| {
+        let j = 0;
+        while (j < vector::length(&source)) {
             let mut carry = source[j] as u64;
             let mut it = size - 1;
             while (it > high || carry != 0) {
@@ -23,7 +24,8 @@ module mosaicmint::utils {
                 it = it - 1;
             };
             high = it;
-        });
+            j = j + 1;
+        };
 
         let mut str: vector<u8> = vector[];
         let mut k = 0;
