@@ -17,7 +17,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Chicago', sans-serif; /* 使用 Chicago 字體 */
 }
 
 /* 添加復古的陰影效果 */
@@ -46,4 +46,98 @@ body {
   background-image: url('/grain.png');
   opacity: 0.05;
   pointer-events: none;
+}
+
+/* 基礎按鈕樣式 */
+[data-dapp-kit] {
+  background-color: rgba(255, 252, 250, 0.7) !important;
+  border: 1px solid rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.15) !important;
+  font-family: monospace !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  padding: 8px 16px !important;
+  border-radius: 0 !important;
+  transition: all 0.2s !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* 懸停效果 */
+[data-dapp-kit]:hover {
+  background-color: rgba(255, 252, 250, 0.9) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2) !important;
+  transform: translate(1px, 1px);
+}
+
+/* 地址文字樣式 */
+.Text__2bv1ur0.Text_textVariants_size_sm__2bv1ur1.Text_textVariants_weight_normal__2bv1ur2.Text_textVariants_mono_true__2bv1ur7 {
+  font-family: monospace !important;
+  font-size: 14px !important;
+  color: #333 !important;
+}
+
+/* 下拉箭頭圖標樣式 */
+button[data-dapp-kit] svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+button[data-dapp-kit] svg path {
+  stroke: #333 !important;
+}
+
+/* 下拉菜單容器樣式 */
+div[data-side="bottom"][data-align="center"][role="menu"] {
+  background-color: rgba(255, 252, 250, 0.95) !important;
+  border: 1px solid rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.15) !important;
+  border-radius: 0 !important;
+  padding: 4px !important;
+  min-width: 200px !important;
+  overflow: hidden !important;
+  margin-top: 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+/* 菜單項目樣式 */
+div[role="menuitem"].AccountDropdownMenu_menuItem__div2ql3,
+div[role="menuitem"].AccountDropdownMenu_switchAccountMenuItem__div2ql4 {
+  font-family: monospace !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  padding: 6px 12px !important;
+  height: 28px !important;
+  transition: all 0.2s !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  line-height: 1 !important;
+}
+
+/* 菜單項目懸停效果 */
+div[role="menuitem"].AccountDropdownMenu_menuItem__div2ql3:hover,
+div[role="menuitem"].AccountDropdownMenu_switchAccountMenuItem__div2ql4:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  transform: translate(1px, 1px);
+}
+
+/* 隱藏分隔線 */
+div.AccountDropdownMenu_separator__div2ql5 {
+  display: none !important;
+}
+
+/* 添加圖片樣式 */
+.memento-image {
+  image-rendering: pixelated;  /* 保持復古像素風格 */
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }

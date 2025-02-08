@@ -4,36 +4,34 @@ import Image from 'next/image';
 interface DesktopIconProps {
   label: string;
   onClick: () => void;
-  icon: string | React.ReactNode;  // 可以是圖片路徑或 React 組件
-  iconType?: 'image' | 'component' | 'emoji';  // 指定 icon 的類型
+  icon: string;
 }
 
-const DesktopIcon: React.FC<DesktopIconProps> = ({ 
-  label, 
-  onClick, 
-  icon, 
-  iconType = 'emoji' 
-}) => {
+const DesktopIcon = ({ label, onClick, icon }: DesktopIconProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('DesktopIcon clicked:', label); // 添加日誌
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
     <div
-      className="flex flex-col items-center gap-1 cursor-pointer p-2"
       onClick={onClick}
+      className="relative group w-full flex justify-center py-1 cursor-pointer"
     >
-      {iconType === 'emoji' ? (
-        <div className="text-2xl">{icon}</div>
-      ) : iconType === 'image' ? (
-        <Image
-          src={icon as string}
-          alt={label}
-          width={32}
-          height={32}
-        />
-      ) : (
-        <span className="text-2xl text-white">{icon}</span>
-      )}
-      <span className="text-xs font-mono text-gray-800 font-medium">
+      <span className="text-3xl select-none">{icon}</span>
+      
+      {/* 氣泡提示 */}
+      <div className="absolute left-full ml-2 px-2 py-1 bg-black/80 text-white text-[10px] font-mono rounded 
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+        style={{ 
+          top: '50%',
+          transform: 'translateY(-50%)'
+        }}
+      >
         {label}
-      </span>
+      </div>
     </div>
   );
 };
