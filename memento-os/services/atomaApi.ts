@@ -49,6 +49,7 @@ interface ConfidentialChatResponse {
 export class AtomaApiService {
   private readonly baseUrl: string;
   private readonly apiKey: string;
+  private readonly defaultModel = "meta-llama/Llama-3.3-70B-Instruct";
 
   constructor() {
     this.baseUrl = 'https://api.atoma.network';
@@ -67,6 +68,7 @@ export class AtomaApiService {
           'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
+          model: this.defaultModel,
           messages,
         }),
       });

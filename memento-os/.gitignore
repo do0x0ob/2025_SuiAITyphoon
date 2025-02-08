@@ -49,3 +49,7 @@ next-env.d.ts
 out
 dist
 build
+
+# env files
+.env.local
+.env.*.local
