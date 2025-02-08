@@ -229,11 +229,6 @@ export default function Home() {
                 icon="📅"
               />
               <DesktopIcon
-                label="Help"
-                onClick={() => handleOpenWindow("help")}
-                icon="❓"
-              />
-              <DesktopIcon
                 label="Upload"
                 onClick={() => handleOpenWindow("walrusupload")}
                 icon="📤"
@@ -242,6 +237,11 @@ export default function Home() {
                 label="View"
                 onClick={() => handleOpenWindow("walrusview")}
                 icon="📥"
+              />
+              <DesktopIcon
+                label="Help"
+                onClick={() => handleOpenWindow("help")}
+                icon="❓"
               />
             </div>
 
