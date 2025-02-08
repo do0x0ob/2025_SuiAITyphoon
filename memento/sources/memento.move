@@ -26,9 +26,9 @@ module memento::memento {
         owner: address,
         username: String,
         photo_blob: String,
-        settings: String,
-        memory: String,
-        assets: String,
+        memento_blob: String,
+        assets_blob: String,
+        setting_blob: String,
     }
 
     // == ONE TIME WITNESS ==
@@ -56,22 +56,22 @@ module memento::memento {
 
         display.add(
             b"photo_blob".to_string(),
-            b"https://memento-os.vercel.app/?blobId={photo_blob}".to_string(), // TODO: change to real photo
+            b"https://memento-os.vercel.app/?blobId={photo_blob}".to_string(), // TODO: change to real photo blob id
         );
 
         display.add(
             b"memory".to_string(),
-            b"https://memento-os.vercel.app/?memoryId={memory_id}".to_string(), // TODO: change to real memory
+            b"https://memento-os.vercel.app/?memoryId={memory_id}".to_string(), // TODO: change to real memory. or blob id only
         );
 
         display.add(
             b"assets".to_string(),
-            b"https://memento-os.vercel.app/?assetsId={assets_id}".to_string(), // TODO: change to real assets
+            b"https://memento-os.vercel.app/?assetsId={assets_id}".to_string(), // TODO: change to real assets blob id
         );
 
         display.add(
-            b"settings".to_string(),
-            b"https://memento-os.vercel.app/?settingsId={settings_id}".to_string(), // TODO: change to real settings
+            b"setting".to_string(),
+            b"https://memento-os.vercel.app/?settingId={setting_id}".to_string(), // TODO: change to real settings blob id
         );
 
         display.update_version();
@@ -93,21 +93,21 @@ module memento::memento {
         state: &mut State,
         username: String,
         photo_blob: String,
-        settings: String,
-        memory: String,
-        assets: String,
+        setting_blob: String,
+        memento_blob: String,
+        assets_blob: String,
         ctx: &mut TxContext
     ) {
         assert!(table::contains(&state.accounts, ctx.sender()), ERegistered);
-        
+
         let os = OS {
             id: object::new(ctx),
             owner: ctx.sender(),
             username,
             photo_blob,
-            settings,
-            memory,
-            assets,
+            setting_blob,
+            memento_blob,
+            assets_blob,
         };
 
         let id_copy = object::uid_to_inner(&os.id);
@@ -117,13 +117,10 @@ module memento::memento {
         sui::event::emit(OSRegistered { id: id_copy, owner: ctx.sender(), username });
     }
 
-    public entry fun update_os(
+    public entry fun update_os_info(
         os: &mut OS,
         username: Option<String>,
         photo_blob: Option<String>,
-        settings: Option<String>,
-        memory: Option<String>,
-        assets: Option<String>,
         ctx: &mut TxContext
     ) {
         let owner = tx_context::sender(ctx);
@@ -134,14 +131,7 @@ module memento::memento {
         if (option::is_some(&photo_blob)) {
             os.photo_blob = option::destroy_some(photo_blob); 
         };
-        if (option::is_some(&settings)) {
-            os.settings = option::destroy_some(settings);
-        };
-        if (option::is_some(&memory)) {
-            os.memory = option::destroy_some(memory);
-        };
-        if (option::is_some(&assets)) {
-            os.assets = option::destroy_some(assets);
-        };
     }
+
+    //TODO: private function to update the blob ids of the os
 }
