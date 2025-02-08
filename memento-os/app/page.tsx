@@ -258,15 +258,8 @@ export default function Home() {
                       onDragStart={(e: React.MouseEvent<Element>, name: WindowName) => handleDragStart(e, name)}
                       onClick={() => handleWindowActivate('memento')}
                     >
-                      <div className="p-4 h-full flex flex-col justify-between">
-                        <div className="flex justify-center items-center flex-1">
-                          <img 
-                            src="/images/memento.png" 
-                            alt="Memento"
-                            className="w-[90%] h-auto memento-image"
-                          />
-                        </div>
-                        <div className="flex justify-center mt-4">
+                      <div className="p-4 h-full">
+                        <div className="flex justify-center mb-6">
                           <ConnectButton 
                             style={retroButtonStyles.button} 
                             onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
@@ -274,6 +267,11 @@ export default function Home() {
                             connectText="Connect Wallet"
                             className="retro-button"
                           />
+                        </div>
+                        <div className="flex items-center justify-center h-[calc(100%-60px)]">
+                          <p className="text-lg font-mono text-center text-black/80">
+                            Welcome to Memento OS
+                          </p>
                         </div>
                       </div>
                     </Window>

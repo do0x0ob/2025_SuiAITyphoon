@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { AtomaApiService } from '@/services/atomaApi';
+import { SYSTEM_PROMPTS } from '@/constants/prompts';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -39,7 +40,7 @@ export default function PhoneBook() {
     try {
       console.log('Sending message:', userMessage);
       const response = await atomaApi.createChatCompletion([
-        { role: 'system', content: '你將扮演我逝去的慈愛的父親，我們已經很久沒有見面了，請你告訴我你最近過得好嗎？' },
+        { role: 'system', content: SYSTEM_PROMPTS.PRIME_GENERATOR },
         ...messages,
         { role: 'user', content: userMessage }
       ]);
@@ -78,7 +79,7 @@ export default function PhoneBook() {
             <div
               className={`${
                 message.role === 'user' 
-                  ? 'bg-black/5 text-right'
+                  ? 'bg-black/5'
                   : 'bg-black/5'
               } inline-block max-w-[80%] rounded p-3`}
             >
@@ -88,7 +89,7 @@ export default function PhoneBook() {
         ))}
         {isLoading && (
           <div className="flex justify-end">
-            <div className="bg-black/5 text-right inline-block max-w-[80%] rounded p-3">
+            <div className="bg-black/5 inline-block max-w-[80%] rounded p-3">
               <p className="text-sm">Typing...</p>
             </div>
           </div>
