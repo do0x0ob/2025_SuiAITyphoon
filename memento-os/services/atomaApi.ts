@@ -57,30 +57,25 @@ export class AtomaApiService {
   }
 
   async createChatCompletion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
-    const endpoint = '/v1/chat/completions';
-    const url = `${this.baseUrl}${endpoint}`;
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
-          model: this.defaultModel,
           messages,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(`API request failed: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`);
+        throw new Error(`API request failed: ${response.status} ${JSON.stringify(errorData)}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Atoma API Error:', error);
+      console.error('Chat API Error:', error);
       throw error;
     }
   }
