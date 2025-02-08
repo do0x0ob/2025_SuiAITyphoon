@@ -2,13 +2,26 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const baseUrl = process.env.ATOMA_API_URL;
+    const baseUrl = process.env.ATOMA_API_URL?.trim();
+    const apiKey = process.env.ATOMA_API_KEY?.trim();
+
+    if (!baseUrl || !apiKey) {
+      console.error('環境變量缺失:', { 
+        baseUrl: !!baseUrl, 
+        apiKey: !!apiKey 
+      });
+      return NextResponse.json(
+        { error: 'Server configuration error' }, 
+        { status: 500 }
+      );
+    }
+
     const body = await req.json();
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ATOMA_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "meta-llama/Llama-3.3-70B-Instruct",
