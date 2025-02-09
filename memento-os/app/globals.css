@@ -17,6 +17,10 @@
   50% { opacity: 0; }
 }
 
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
 .cursor-blink {
   display: inline-block;
   margin-left: 2px;

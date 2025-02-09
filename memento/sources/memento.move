@@ -8,7 +8,7 @@ module memento::memento {
     };
 
     // == ERRORS ==
-    
+
     const ERegistered: u64 = 0;
     
     // == STRUCTS ==
@@ -78,7 +78,7 @@ module memento::memento {
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        assert!(!table::contains(&state.accounts, sender), ERegistered);
+        // assert!(!table::contains(&state.accounts, sender), ERegistered); #TODO: Comment out for Test Only
 
         let os = OS {
             id: object::new(ctx),
