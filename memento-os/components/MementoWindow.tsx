@@ -147,7 +147,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
         return;
       }
       
-      if (e.key.length === 1) {  // 單個字符
+      if (e.key.length === 1) {
         setUsername(prev => prev + e.key);
       }
     };

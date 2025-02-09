@@ -29,6 +29,7 @@ module memento::memento {
         owner: address,
         username: String,
         settings_blob_id: String,
+        image_url: String,
         mementos: vector<Memento>,
     }
 
@@ -68,6 +69,10 @@ module memento::memento {
             b"description".to_string(),
             b"Your personal Memento OS on Sui Network".to_string()
         );
+        display.add(
+            b"image_url".to_string(),
+            b"https://aggregator.walrus-testnet.walrus.space/v1/blobs/jBwMThR7sKzyZAeuDla4lPSJ-AW4f6irNQKsY3OdwwU".to_string()
+        );
 
         display.update_version();
 
@@ -97,6 +102,7 @@ module memento::memento {
             owner: sender,
             username,
             settings_blob_id: settings_blob,
+            image_url: b"jBwMThR7sKzyZAeuDla4lPSJ-AW4f6irNQKsY3OdwwU".to_string(),    
             mementos: vector::empty(),
         };
 
