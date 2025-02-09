@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 在這裡添加自定義樣式 */
+@keyframes typing {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1.5s step-end infinite;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
