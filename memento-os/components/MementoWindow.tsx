@@ -92,7 +92,7 @@ export default function MementoWindow() {
             </div>
             <button
               onClick={handleInitializeOS}
-              className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+              className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
             >
               Create Your Memory Space
             </button>
@@ -111,16 +111,16 @@ export default function MementoWindow() {
 
       {/* 底部按鈕區域 - 只在有 NFT 時顯示 */}
       {walletStatus === 'connected-with-nft' && (
-        <div className="p-4 border-t border-gray-200 flex justify-center gap-4">
+        <div className="p-8 flex justify-center gap-4">
           <button
             onClick={handleCreateEvent}
-            className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+            className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
           >
             Capture Memory
           </button>
           <button
             onClick={handleCreateMemento}
-            className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+            className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
           >
             Create Memento
           </button>
