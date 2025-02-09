@@ -1,9 +1,9 @@
 import { bcs } from "@mysten/sui/bcs";
 import { Transaction as TX } from "@mysten/sui/transactions";
 
-// 合約常量
-const PACKAGE_ID = '0x0ae688e13bf8361b74153652fc5f95993341fd85a99aa4b6ba727add1e1754f1';
-const STATE_ID = '0x7b50f719b346eff07f501faa506322bedb54ad1154cf40b6be84351972d36822';
+// 修改常量定義，加上 export
+export const PACKAGE_ID = '0x370332371f5d6119d32e6a36ba231faea4627649280dd60722a51724c60effc2';
+export const STATE_ID = '0x9b70b65015f554caef63cd94b3f2bc6bd6b2e2bd6dbb7b187894a260f108c25a';
 
 export const mintOS = async (username: string, settings_blob: string = "") => {
   console.log('mintOS params:', username, settings_blob);

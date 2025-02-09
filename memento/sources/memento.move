@@ -13,6 +13,11 @@ module memento::memento {
     
     // == STRUCTS ==
 
+    public struct Memento has store {
+        name: String,
+        blob_id: String,
+    }
+
     public struct State has key {
         id: UID,
         accounts: Table<address, ID>,
@@ -24,6 +29,8 @@ module memento::memento {
         owner: address,
         username: String,
         settings_blob_id: String,
+        image_url: String,
+        mementos: vector<Memento>,
     }
 
     // == ONE TIME WITNESS ==
@@ -36,6 +43,12 @@ module memento::memento {
         id: ID,
         owner: address,
         username: String,
+    }
+
+    public struct MementoCreated has copy, drop {
+        os_id: ID,
+        name: String,
+        blob_id: String,
     }
 
     // == INITIALIZATION ==
@@ -55,6 +68,10 @@ module memento::memento {
         display.add(
             b"description".to_string(),
             b"Your personal Memento OS on Sui Network".to_string()
+        );
+        display.add(
+            b"image_url".to_string(),
+            b"https://aggregator.walrus-testnet.walrus.space/v1/blobs/jBwMThR7sKzyZAeuDla4lPSJ-AW4f6irNQKsY3OdwwU".to_string()
         );
 
         display.update_version();
@@ -78,13 +95,15 @@ module memento::memento {
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        // assert!(!table::contains(&state.accounts, sender), ERegistered); #TODO: Comment out for Test Only
+        assert!(!table::contains(&state.accounts, sender), ERegistered);
 
         let os = OS {
             id: object::new(ctx),
             owner: sender,
             username,
             settings_blob_id: settings_blob,
+            image_url: b"jBwMThR7sKzyZAeuDla4lPSJ-AW4f6irNQKsY3OdwwU".to_string(),    
+            mementos: vector::empty(),
         };
 
         let id_copy = object::uid_to_inner(&os.id);
@@ -98,6 +117,29 @@ module memento::memento {
             id: id_copy, 
             owner: sender, 
             username 
+        });
+    }
+
+    public entry fun create_memento(
+        os: &mut OS,
+        name: String,
+        blob_id: String,
+        ctx: &mut TxContext
+    ) {
+        let sender = tx_context::sender(ctx);
+        assert!(os.owner == sender, 0);
+
+        let memento = Memento {
+            name,
+            blob_id,
+        };
+
+        vector::push_back(&mut os.mementos, memento);
+
+        event::emit(MementoCreated {
+            os_id: object::uid_to_inner(&os.id),
+            name,
+            blob_id,
         });
     }
 }
