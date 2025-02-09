@@ -2,6 +2,7 @@ import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransa
 import { retroButtonStyles } from '@/styles/components';
 import { useState, useEffect } from 'react';
 import { mintOS } from '@/utils/transactions';
+import { walrusApi } from '@/services/walrusApi';
 
 // 模擬用的臨時類型
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
@@ -17,6 +18,9 @@ export default function MementoWindow() {
   const [digest, setDigest] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
+  const [welcomeGifUrl, setWelcomeGifUrl] = useState<string>('');
+  const [isGifLoading, setIsGifLoading] = useState(false);
+  const [gifError, setGifError] = useState<string>('');
   
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
@@ -171,6 +175,41 @@ export default function MementoWindow() {
     console.log('Creating new memento...', currentAccount?.address);
   };
 
+  // 添加獲取 GIF 的 useEffect
+  useEffect(() => {
+    const fetchWelcomeGif = async () => {
+      setIsGifLoading(true);
+      setGifError('');
+      
+      try {
+        const blobId = '6Ci8-LwW5w0rZ4f3FATjJm3-1YyApJL1eTfUGuZITLw';
+        const response = await fetch(`/api/walrus/blob/${blobId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load animation');
+        }
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setWelcomeGifUrl(url);
+      } catch (err) {
+        console.error('Error loading welcome animation:', err);
+        setGifError('Failed to load welcome animation');
+      } finally {
+        setIsGifLoading(false);
+      }
+    };
+
+    fetchWelcomeGif();
+
+    // 清理函數
+    return () => {
+      if (welcomeGifUrl) {
+        URL.revokeObjectURL(welcomeGifUrl);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex flex-col h-full">
       {/* Connect Button 區域 - 減少底部 padding */}
@@ -265,17 +304,20 @@ export default function MementoWindow() {
               <span className="cursor-blink">_</span>
             </div>
             
-            {/* 添加歡迎動畫 */}
             <div className="relative h-80">
-              <img
-                src="/welcome.gif"
-                alt="Welcome Animation"
-                className="memento-image w-full h-full object-contain"
-              />
-              <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
+              {gifError ? (
+                <div className="text-red-500 text-sm">{gifError}</div>
+              ) : isGifLoading ? (
+                <div className="text-gray-500">Loading welcome animation...</div>
+              ) : welcomeGifUrl ? (
+                <img
+                  src={welcomeGifUrl}
+                  alt="Welcome Animation"
+                  className="memento-image w-full h-full object-contain border-black"
+                />
+              ) : null}
             </div>
 
-            {/* 將按鈕移到這裡 */}
             <div className="mt-8 flex justify-center gap-4">
               <button
                 onClick={handleCreateEvent}
