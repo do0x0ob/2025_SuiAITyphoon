@@ -1,7 +1,7 @@
 import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
 import { useState, useEffect, useCallback } from 'react';
-import { mintOS } from '@/utils/transactions';
+import { mintOS, PACKAGE_ID } from '@/utils/transactions';
 import CreateMementoDialog from './CreateMementoDialog';
 import { WindowName } from '@/types';
 
@@ -9,7 +9,7 @@ import { WindowName } from '@/types';
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
 
 // NFT 類型常量
-const OS_TYPE = '0x0ae688e13bf8361b74153652fc5f95993341fd85a99aa4b6ba727add1e1754f1::memento::OS';
+const OS_TYPE = `${PACKAGE_ID}::memento::OS`;
 
 interface MementoWindowProps {
   onDragStart: (e: React.MouseEvent<Element>, name: WindowName) => void;
@@ -65,7 +65,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
 
     try {
       setIsMinting(true);
-      const tx = await mintOS(username);
+      const tx = await mintOS(username, 'initial-settings');
 
       await signAndExecuteTransaction(
         {
@@ -76,7 +76,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
           onSuccess: async (result) => {
             console.log("Transaction successful:", result);
             setDigest(result.digest);
-            await checkNFTOwnership(); // 重新檢查 NFT 狀態
+            await checkNFTOwnership();
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
