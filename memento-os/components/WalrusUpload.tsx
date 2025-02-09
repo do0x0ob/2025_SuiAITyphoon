@@ -19,7 +19,7 @@ export default function WalrusUpload() {
     try {
       const formData = new FormData();
       formData.append('data', file);
-      formData.append('epochs', '1');
+      formData.append('epochs', '100');
 
       const response = await fetch('/api/walrus', {
         method: 'PUT',

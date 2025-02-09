@@ -1,6 +1,6 @@
 import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { mintOS } from '@/utils/transactions';
 
 // 模擬用的臨時類型
@@ -173,8 +173,8 @@ export default function MementoWindow() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Connect Button 區域 - 始終顯示在頂部 */}
-      <div className="p-4 flex justify-center">
+      {/* Connect Button 區域 - 減少底部 padding */}
+      <div className="pt-6 px-4 flex justify-center">
         <ConnectButton 
           style={retroButtonStyles.button} 
           onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
@@ -184,8 +184,8 @@ export default function MementoWindow() {
         />
       </div>
 
-      {/* 主要內容區域 */}
-      <div className="flex-1 p-4">
+      {/* 主要內容區域 - 減少頂部 padding */}
+      <div className="flex-1 px-4 pb-4">
         {walletStatus === 'disconnected' && (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="font-mono text-lg text-black/80 mb-8">
@@ -209,9 +209,9 @@ export default function MementoWindow() {
                 </div>
 
                 <div className="flex flex-col items-center space-y-2">
-                  <div className="text-sm text-gray-500">enter your name:</div>
+                  <div className="text-sm text-gray-500">Enter your name:</div>
                   <div className="flex items-center">
-                    <span className="text-lg">$ {username}</span>
+                    <span className="text-lg"> {username}</span>
                     <span className={`ml-1 inline-block w-2 h-5 bg-black ${isTyping ? 'animate-pulse' : 'animate-blink'}`}>
                     </span>
                   </div>
@@ -260,31 +260,39 @@ export default function MementoWindow() {
 
         {walletStatus === 'connected-with-nft' && (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="font-mono text-lg text-black/80 mb-8">
+            <div className="font-mono text-lg text-black/80 mb-2">
               <span>Memory Space Active</span>
               <span className="cursor-blink">_</span>
+            </div>
+            
+            {/* 添加歡迎動畫 */}
+            <div className="relative h-80">
+              <img
+                src="/welcome.gif"
+                alt="Welcome Animation"
+                className="memento-image w-full h-full object-contain"
+              />
+              <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
+            </div>
+
+            {/* 將按鈕移到這裡 */}
+            <div className="mt-8 flex justify-center gap-4">
+              <button
+                onClick={handleCreateEvent}
+                className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+              >
+                Capture Memory
+              </button>
+              <button
+                onClick={handleCreateMemento}
+                className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+              >
+                Create Memento
+              </button>
             </div>
           </div>
         )}
       </div>
-
-      {/* 底部按鈕區域 - 只在有 NFT 時顯示 */}
-      {walletStatus === 'connected-with-nft' && (
-        <div className="p-8 flex justify-center gap-4">
-          <button
-            onClick={handleCreateEvent}
-            className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
-          >
-            Capture Memory
-          </button>
-          <button
-            onClick={handleCreateMemento}
-            className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
-          >
-            Create Memento
-          </button>
-        </div>
-      )}
     </div>
   );
 } 
