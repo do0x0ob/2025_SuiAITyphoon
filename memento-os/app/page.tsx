@@ -12,6 +12,7 @@ import PhoneBook from '@/components/PhoneBook';
 import WalrusUpload from '@/components/WalrusUpload';
 import WalrusView from '@/components/WalrusView';
 import AboutContent from '@/components/AboutContent';
+import MementoWindow from '@/components/MementoWindow';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -273,22 +274,7 @@ export default function Home() {
                       onDragStart={(e: React.MouseEvent<Element>, name: string) => handleDragStart(e, name)}
                       onClick={() => handleWindowActivate('memento')}
                     >
-                      <div className="p-4 h-full">
-                        <div className="flex justify-center mb-6">
-                          <ConnectButton 
-                            style={retroButtonStyles.button} 
-                            onMouseOver={e => Object.assign(e.currentTarget.style, retroButtonStyles.buttonHover)}
-                            onMouseOut={e => Object.assign(e.currentTarget.style, retroButtonStyles.button)}
-                            connectText="Connect Wallet"
-                            className="retro-button"
-                          />
-                        </div>
-                        <div className="flex items-center justify-center h-[calc(100%-60px)]">
-                          <p className="text-lg font-mono text-center text-black/80">
-                            Welcome to Memento OS
-                          </p>
-                        </div>
-                      </div>
+                      <MementoWindow />
                     </Window>
                   );
                 case 'phonebook':
