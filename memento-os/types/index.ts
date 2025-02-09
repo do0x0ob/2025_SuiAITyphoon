@@ -15,4 +15,10 @@ export interface ChatCompletionResponse {
   }[];
 }
 
+export interface MementoData {
+  name: string;
+  description: string;
+  traits: string[];
+} 
+
 // 其他類型定義...

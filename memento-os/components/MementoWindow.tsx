@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { mintOS, PACKAGE_ID } from '@/utils/transactions';
 import CreateMementoDialog from './CreateMementoDialog';
 import { WindowName } from '@/types';
+import { MementoData } from '@/types/index';
 
 // 模擬用的臨時類型
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
@@ -221,7 +222,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
 
   return (
     <div className="flex flex-col h-full">
-      {/* Connect Button 區域 - 減少底部 padding */}
       <div className="pt-6 px-4 flex justify-center">
         <ConnectButton 
           style={retroButtonStyles.button} 
@@ -232,7 +232,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
         />
       </div>
 
-      {/* 主要內容區域 - 減少頂部 padding */}
       <div className="flex-1 px-4 pb-4">
         {walletStatus === 'disconnected' && (
           <div className="flex flex-col items-center justify-center h-full">
@@ -354,10 +353,3 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
     </div>
   );
 }
-
-// 添加類型定義（如果還沒有的話）
-interface MementoData {
-  name: string;
-  description: string;
-  traits: string[];
-} 

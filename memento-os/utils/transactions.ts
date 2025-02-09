@@ -18,4 +18,17 @@ export const mintOS = async (username: string, settings_blob: string = "") => {
     ],
   });
   return tx;
+};
+
+export const createMemento = async (osId: string, name: string, blobId: string) => {
+  const tx = new TX();
+  tx.moveCall({
+    target: `${PACKAGE_ID}::memento::create_memento`,
+    arguments: [
+      tx.object(osId),
+      tx.pure(bcs.string().serialize(name).toBytes()),
+      tx.pure(bcs.string().serialize(blobId).toBytes()),
+    ],
+  });
+  return tx;
 }; 
