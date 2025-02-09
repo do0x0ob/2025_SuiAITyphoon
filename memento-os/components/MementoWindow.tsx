@@ -1,6 +1,6 @@
 import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { mintOS } from '@/utils/transactions';
 
 // 模擬用的臨時類型
