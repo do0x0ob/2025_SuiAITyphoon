@@ -1,22 +1,51 @@
-import { ConnectButton, useCurrentAccount } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useSuiClient } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
 import { useState, useEffect } from 'react';
 
 // 模擬用的臨時類型
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
 
+// NFT 類型常量
+const OS_TYPE = '0x6d12afb8e563ba48b4a6e91a44c7d53752c25965e98ce00e332e3f7ef43243be::memento::OS';
+
 export default function MementoWindow() {
   const currentAccount = useCurrentAccount();
+  const suiClient = useSuiClient();
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('disconnected');
 
   useEffect(() => {
-    if (!currentAccount) {
-      setWalletStatus('disconnected');
-    } else {
-      // 這裡之後可以添加檢查 NFT 的邏輯
-      setWalletStatus('connected-no-nft');
-    }
-  }, [currentAccount]);
+    const checkNFTOwnership = async () => {
+      if (!currentAccount) {
+        setWalletStatus('disconnected');
+        return;
+      }
+
+      try {
+        // 查詢用戶擁有的指定類型的對象
+        const { data: objects } = await suiClient.getOwnedObjects({
+          owner: currentAccount.address,
+          filter: {
+            StructType: OS_TYPE
+          },
+          options: {
+            showType: true,
+          }
+        });
+
+        // 如果找到至少一個對象，表示用戶擁有 NFT
+        if (objects && objects.length > 0) {
+          setWalletStatus('connected-with-nft');
+        } else {
+          setWalletStatus('connected-no-nft');
+        }
+      } catch (error) {
+        console.error('Error checking NFT ownership:', error);
+        setWalletStatus('connected-no-nft');
+      }
+    };
+
+    checkNFTOwnership();
+  }, [currentAccount, suiClient]);
 
   const handleInitializeOS = () => {
     console.log('Initializing OS...', currentAccount?.address);
@@ -76,7 +105,6 @@ export default function MementoWindow() {
               <span>Memory Space Active</span>
               <span className="cursor-blink">_</span>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Connected: {currentAccount?.address.slice(0, 6)}...{currentAccount?.address.slice(-4)}</p>
           </div>
         )}
       </div>
