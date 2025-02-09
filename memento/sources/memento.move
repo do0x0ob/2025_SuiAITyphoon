@@ -1,20 +1,18 @@
 module memento::memento {
-
     use std::string::{ String };
-    //use memento::utils::to_b36;
     use sui::{
         package,
         display,
+        event,
         table::{ Self, Table }
     };
 
     // == ERRORS ==
-
-    const ERegistered: u64 = 0;
-    const ENotOwner: u64 = 1;
     
+    const ERegistered: u64 = 0;
     
     // == STRUCTS ==
+
     public struct State has key {
         id: UID,
         accounts: Table<address, ID>,
@@ -25,10 +23,7 @@ module memento::memento {
         id: UID,
         owner: address,
         username: String,
-        photo_blob: String,
-        memento_blob: String,
-        assets_blob: String,
-        setting_blob: String,
+        settings_blob_id: String,
     }
 
     // == ONE TIME WITNESS ==
@@ -37,7 +32,7 @@ module memento::memento {
 
     // == EVENTS ==
 
-    public struct OSRegistered has copy, drop {
+    public struct OSMinted has copy, drop {
         id: ID,
         owner: address,
         username: String,
@@ -50,34 +45,22 @@ module memento::memento {
         let mut display = display::new<OS>(&publisher, ctx);
 
         display.add(
+            b"name".to_string(),
+            b"Memento OS".to_string()
+        );
+        display.add(
             b"link".to_string(),
-            b"https://memento-os.vercel.app/".to_string(), // TODO: this should be the personal page(window) of the owner
+            b"https://memento-os.vercel.app".to_string()
         );
-
         display.add(
-            b"photo_blob".to_string(),
-            b"https://memento-os.vercel.app/?blobId={photo_blob}".to_string(), // TODO: change to real photo blob id
-        );
-
-        display.add(
-            b"memory".to_string(),
-            b"https://memento-os.vercel.app/?memoryId={memory_id}".to_string(), // TODO: change to real memory. or blob id only
-        );
-
-        display.add(
-            b"assets".to_string(),
-            b"https://memento-os.vercel.app/?assetsId={assets_id}".to_string(), // TODO: change to real assets blob id
-        );
-
-        display.add(
-            b"setting".to_string(),
-            b"https://memento-os.vercel.app/?settingId={setting_id}".to_string(), // TODO: change to real settings blob id
+            b"description".to_string(),
+            b"Your personal Memento OS on Sui Network".to_string()
         );
 
         display.update_version();
 
         transfer::share_object(State {
-            id: object::new(ctx), 
+            id: object::new(ctx),
             accounts: table::new(ctx),
             all_os: vector::empty(),
         });
@@ -85,53 +68,36 @@ module memento::memento {
         transfer::public_transfer(publisher, ctx.sender());
         transfer::public_transfer(display, ctx.sender());
     }
-    
 
     // == ENTRY FUNCTIONS ==
 
-    public entry fun create_os(
+    public entry fun mint_os(
         state: &mut State,
         username: String,
-        photo_blob: String,
-        setting_blob: String,
-        memento_blob: String,
-        assets_blob: String,
+        settings_blob: String,
         ctx: &mut TxContext
     ) {
-        assert!(table::contains(&state.accounts, ctx.sender()), ERegistered);
+        let sender = tx_context::sender(ctx);
+        assert!(!table::contains(&state.accounts, sender), ERegistered);
 
         let os = OS {
             id: object::new(ctx),
-            owner: ctx.sender(),
+            owner: sender,
             username,
-            photo_blob,
-            setting_blob,
-            memento_blob,
-            assets_blob,
+            settings_blob_id: settings_blob,
         };
 
         let id_copy = object::uid_to_inner(&os.id);
+        
         vector::push_back(&mut state.all_os, id_copy);
-        table::add(&mut state.accounts, ctx.sender(), id_copy);
-        transfer::public_transfer(os, ctx.sender());
-        sui::event::emit(OSRegistered { id: id_copy, owner: ctx.sender(), username });
+        table::add(&mut state.accounts, sender, id_copy);
+        
+        transfer::public_transfer(os, sender);
+        
+        event::emit(OSMinted { 
+            id: id_copy, 
+            owner: sender, 
+            username 
+        });
     }
-
-    public entry fun update_os_info(
-        os: &mut OS,
-        username: Option<String>,
-        photo_blob: Option<String>,
-        ctx: &mut TxContext
-    ) {
-        let owner = tx_context::sender(ctx);
-        assert!(owner == os.owner, ENotOwner);
-        if (option::is_some(&username)) {
-            os.username = option::destroy_some(username);
-        };
-        if (option::is_some(&photo_blob)) {
-            os.photo_blob = option::destroy_some(photo_blob); 
-        };
-    }
-
-    //TODO: private function to update the blob ids of the os
 }
