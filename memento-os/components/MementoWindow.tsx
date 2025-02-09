@@ -1,8 +1,9 @@
 import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { mintOS } from '@/utils/transactions';
-import { walrusApi } from '@/services/walrusApi';
+import CreateMementoDialog from './CreateMementoDialog';
+import { WindowName } from '@/types';
 
 // 模擬用的臨時類型
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
@@ -10,7 +11,12 @@ type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
 // NFT 類型常量
 const OS_TYPE = '0x0ae688e13bf8361b74153652fc5f95993341fd85a99aa4b6ba727add1e1754f1::memento::OS';
 
-export default function MementoWindow() {
+interface MementoWindowProps {
+  onDragStart: (e: React.MouseEvent<Element>, name: WindowName) => void;
+  onCreateMemento: () => void;
+}
+
+export default function MementoWindow({ onDragStart, onCreateMemento }: MementoWindowProps) {
   const currentAccount = useCurrentAccount();
   const suiClient = useSuiClient();
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('disconnected');
@@ -21,6 +27,7 @@ export default function MementoWindow() {
   const [welcomeGifUrl, setWelcomeGifUrl] = useState<string>('');
   const [isGifLoading, setIsGifLoading] = useState(false);
   const [gifError, setGifError] = useState<string>('');
+  const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
   
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
@@ -171,9 +178,11 @@ export default function MementoWindow() {
     console.log('Creating new event...', currentAccount?.address);
   };
 
-  const handleCreateMemento = () => {
-    console.log('Creating new memento...', currentAccount?.address);
-  };
+  // 處理 Memento 創建
+  const handleCreateMemento = useCallback((data: MementoData) => {
+    console.log('Creating memento with data:', data);
+    // TODO: 處理 memento 創建邏輯
+  }, []);
 
   // 添加獲取 GIF 的 useEffect
   useEffect(() => {
@@ -326,7 +335,7 @@ export default function MementoWindow() {
                 Capture Memory
               </button>
               <button
-                onClick={handleCreateMemento}
+                onClick={onCreateMemento}
                 className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
               >
                 Create Memento
@@ -335,6 +344,20 @@ export default function MementoWindow() {
           </div>
         )}
       </div>
+
+      {/* 添加 Dialog 組件 */}
+      <CreateMementoDialog
+        isOpen={isCreateMementoOpen}
+        onClose={() => setIsCreateMementoOpen(false)}
+        onSubmit={handleCreateMemento}
+      />
     </div>
   );
+}
+
+// 添加類型定義（如果還沒有的話）
+interface MementoData {
+  name: string;
+  description: string;
+  traits: string[];
 } 
