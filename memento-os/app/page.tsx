@@ -11,6 +11,7 @@ import WalrusUpload from '@/components/WalrusUpload';
 import WalrusView from '@/components/WalrusView';
 import AboutContent from '@/components/AboutContent';
 import MementoWindow from '@/components/MementoWindow';
+import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDialog';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -18,14 +19,22 @@ const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
 });
 
 const defaultWindowSizes = {
-  memento: { width: 540, height: 600 },
+  memento: { width: 500, height: 600 },
   phonebook: { width: 400, height: 600 },
   eventbook: { width: 400, height: 600 },
   about: { width: 540, height: 700 },
   help: { width: 500, height: 400 },
   walrusupload: { width: 500, height: 400 },
   walrusview: { width: 500, height: 400 },
+  'memento-create': { width: 480, height: 520 },
 };
+
+interface WindowState {
+  component: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  minimized: boolean;
+}
 
 export default function Home() {
   // 計算視窗中心位置的函數
@@ -53,8 +62,11 @@ export default function Home() {
     help: { x: 300, y: 300 },
     walrusupload: { x: 350, y: 350 },
     walrusview: { x: 400, y: 400 },
+    'memento-create': { x: 250, y: 250 },
   });
   const [windowSizes, setWindowSizes] = useState(defaultWindowSizes);
+  const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
+  const [windows, setWindows] = useState<Record<string, WindowState>>({});
 
   // 使用 useEffect 來設置 Memento 窗口的初始位置
   useEffect(() => {
@@ -156,6 +168,12 @@ export default function Home() {
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // 處理 Memento 創建
+  const handleCreateMemento = (data: MementoData) => {
+    console.log('Creating memento with data:', data);
+    setIsCreateMementoOpen(false);
   };
 
   return (
@@ -274,7 +292,26 @@ export default function Home() {
                       onDragStart={(e: React.MouseEvent<Element>, name: string) => handleDragStart(e, name)}
                       onClick={() => handleWindowActivate('memento')}
                     >
-                      <MementoWindow />
+                      <MementoWindow 
+                        onDragStart={handleDragStart} 
+                        onCreateMemento={() => {
+                          // 獲取 Memento 窗口的位置
+                          const mementoPos = windowPositions.memento;
+                          const mementoSize = windowSizes.memento;
+                          
+                          // 設置新窗口位置在 Memento 右側偏上
+                          setWindowPositions(prev => ({
+                            ...prev,
+                            'memento-create': {
+                              x: mementoPos.x + mementoSize.width + 20, // Memento 右側 20px
+                              y: mementoPos.y,  // 比 Memento 高 50px
+                            }
+                          }));
+                          
+                          setIsCreateMementoOpen(true);
+                          handleWindowActivate('memento-create');
+                        }} 
+                      />
                     </Window>
                   );
                 case 'phonebook':
@@ -393,6 +430,28 @@ export default function Home() {
                   );
               }
             })}
+
+            {/* 將 CreateMementoDialog 移到這裡 */}
+            {isCreateMementoOpen && (
+              <Window
+                key="memento-create"
+                name="memento-create"
+                title="Create Memento"
+                position={windowPositions['memento-create']}
+                size={windowSizes['memento-create']}
+                isActive={activeWindow === 'memento-create'}
+                resizable={false}
+                onClose={() => setIsCreateMementoOpen(false)}
+                onDragStart={handleDragStart}
+                onClick={() => handleWindowActivate('memento-create')}
+              >
+                <CreateMementoDialog
+                  isOpen={true}
+                  onClose={() => setIsCreateMementoOpen(false)}
+                  onSubmit={handleCreateMemento}
+                />
+              </Window>
+            )}
           </div>
         </div>
       </div>
