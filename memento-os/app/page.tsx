@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ConnectButton } from '@mysten/dapp-kit';
 import type { WindowName } from '../types';
 import '@mysten/dapp-kit/dist/index.css';
 import dynamic from 'next/dynamic';
 import Window from '@/components/Window';
 import Header from '@/components/Header';
-import { retroButtonStyles } from '@/styles/components';
 import PhoneBook from '@/components/PhoneBook';
 import WalrusUpload from '@/components/WalrusUpload';
 import WalrusView from '@/components/WalrusView';
@@ -18,6 +16,16 @@ import MementoWindow from '@/components/MementoWindow';
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
   ssr: false,
 });
+
+const defaultWindowSizes = {
+  memento: { width: 540, height: 600 },
+  phonebook: { width: 400, height: 600 },
+  eventbook: { width: 400, height: 600 },
+  about: { width: 540, height: 700 },
+  help: { width: 500, height: 400 },
+  walrusupload: { width: 500, height: 400 },
+  walrusview: { width: 500, height: 400 },
+};
 
 export default function Home() {
   // 計算視窗中心位置的函數
@@ -46,15 +54,7 @@ export default function Home() {
     walrusupload: { x: 350, y: 350 },
     walrusview: { x: 400, y: 400 },
   });
-  const [windowSizes, setWindowSizes] = useState({
-    memento: mementoSize,
-    phonebook: defaultSize,
-    eventbook: defaultSize,
-    about: aboutSize,
-    help: defaultSize,
-    walrusupload: defaultSize,
-    walrusview: defaultSize,
-  });
+  const [windowSizes, setWindowSizes] = useState(defaultWindowSizes);
 
   // 使用 useEffect 來設置 Memento 窗口的初始位置
   useEffect(() => {
