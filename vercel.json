@@ -1,0 +1,10 @@
+{
+  "images": {
+    "sizes": [90, 180],
+    "minimumCacheTTL": 60,
+    "formats": ["image/webp", "image/avif"],
+    "domains": [],
+    "remotePatterns": [],
+    "unoptimized": true
+  }
+} 
