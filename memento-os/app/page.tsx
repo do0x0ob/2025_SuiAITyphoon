@@ -293,12 +293,11 @@ export default function Home() {
                       onClick={() => handleWindowActivate('memento')}
                     >
                       <MementoWindow 
-                        onDragStart={handleDragStart} 
+                        onDragStart={handleDragStart}
                         onCreateMemento={() => {
                           // 獲取 Memento 窗口的位置
                           const mementoPos = windowPositions.memento;
                           const mementoSize = windowSizes.memento;
-                          
                           // 設置新窗口位置在 Memento 右側偏上
                           setWindowPositions(prev => ({
                             ...prev,
