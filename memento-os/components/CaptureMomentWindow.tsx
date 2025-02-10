@@ -126,63 +126,86 @@ const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-medium mb-4">Capture Moment</h2>
+      <h2 className="text-xl font-medium mb-4">Capture Your Moment</h2>
       <div className="flex flex-col gap-4">
         <div className="space-y-4">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-sm font-medium">Title *</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="px-3 py-1.5 border border-black/80 bg-white/70"
-              placeholder="Enter moment title"
+              className="px-3 py-2 border border-black/80 bg-white/70 focus:outline-none focus:ring-2 focus:ring-black/20"
+              placeholder="Give your moment a title"
             />
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-sm font-medium">Description *</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="px-3 py-1.5 border border-black/80 bg-white/70 h-24"
-              placeholder="Describe this moment..."
+              className="px-3 py-2 border border-black/80 bg-white/70 h-24 focus:outline-none focus:ring-2 focus:ring-black/20"
+              placeholder="What's special about this moment?"
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Image (optional)</label>
+            <label className="text-sm font-medium">Capture Image</label>
             <input
               type="file"
               onChange={handleFileChange}
               accept="image/*"
-              className="px-3 py-1.5 border border-black/80 bg-white/70"
+              className="px-3 py-2 border border-black/80 bg-white/70 focus:outline-none focus:ring-2 focus:ring-black/20"
               disabled={isLoading}
             />
           </div>
         </div>
 
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            {status === 'uploading' && 'Uploading image...'}
-            {status === 'creating' && 'Creating moment...'}
+        <div className="flex justify-between items-center mt-2">
+          <div className="text-sm font-mono">
+            {status === 'uploading' && (
+              <span className="text-black/80">
+                {`>`} Crystallizing this moment in time
+                <span className="animate-[blink_1s_infinite]">_</span>
+              </span>
+            )}
+            {status === 'creating' && (
+              <span className="text-black/80">
+                {`>`} Creating your moment
+                <span className="animate-[blink_1s_infinite]">_</span>
+              </span>
+            )}
             {status === 'done' && (
-              <a 
-                href={`https://suiexplorer.com/txblock/${txDigest}?network=testnet`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800"
-              >
-                View transaction
-              </a>
+              <div className="flex flex-col gap-1">
+                <span className="text-green-600">
+                  {`>`} Moment captured successfully
+                  <span className="animate-[blink_1s_infinite]">_</span>
+                </span>
+                <a 
+                  href={`https://suiexplorer.com/txblock/${txDigest}?network=testnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500 hover:text-gray-700 underline ml-4"
+                >
+                  view on explorer
+                </a>
+              </div>
             )}
           </div>
           <button
             onClick={handleCapture}
             disabled={!title.trim() || isLoading}
-            className="px-6 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-black text-white hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-sm"
           >
-            {isLoading ? 'Processing...' : 'Capture'}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span>Processing</span>
+                <span className="animate-pulse">...</span>
+              </span>
+            ) : (
+              'Capture'
+            )}
           </button>
         </div>
       </div>
