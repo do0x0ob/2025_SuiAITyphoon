@@ -15,6 +15,7 @@ import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDial
 import { useSuiClient, useCurrentAccount } from '@mysten/dapp-kit';
 import CaptureMomentWindow from '@/components/CaptureMomentWindow';
 import { PACKAGE_ID } from '@/utils/transactions';
+import EventBookWindow from '@/components/EventBookWindow';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -387,7 +388,7 @@ export default function Home() {
                     <Window
                       key={name}
                       name={name}
-                      title="EventBook"
+                      title="Event Book"
                       position={windowPositions.eventbook}
                       size={windowSizes.eventbook}
                       isActive={activeWindow === 'eventbook'}
@@ -397,10 +398,7 @@ export default function Home() {
                       onResize={handleResize}
                       onClick={() => handleWindowActivate('eventbook')}
                     >
-                      <div className="p-4">
-                        <h2 className="text-xl font-medium mb-4">Event Book</h2>
-                        {/* Event Book 內容 */}
-                      </div>
+                      <EventBookWindow osId={currentOsId} />
                     </Window>
                   );
                 case 'about':
