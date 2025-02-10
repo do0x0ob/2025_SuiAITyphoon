@@ -72,7 +72,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
       setIsMinting(true);
       const tx = await mintOS(username, 'initial-settings');
 
-      await signAndExecuteTransaction(
+      signAndExecuteTransaction(
         {
           transaction: tx as any,
           chain: 'sui:testnet',
@@ -166,7 +166,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
   // 處理 Memento 創建
   const handleCreateMemento = useCallback((data: MementoData) => {
     console.log('Creating memento with data:', data);
-    // TODO: 處理 memento 創建邏輯
   }, []);
 
   // 添加獲取 GIF 的 useEffect
