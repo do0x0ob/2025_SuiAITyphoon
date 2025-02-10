@@ -5,7 +5,7 @@ export type WindowName = 'memento' | 'phonebook' | 'eventbook' | 'about' | 'help
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 export interface ChatMessage {
-  role: ChatRole;
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
@@ -14,5 +14,13 @@ export interface ChatCompletionResponse {
     message: ChatMessage;
   }[];
 }
+
+// Memento 相關類型
+export interface Memento {
+  name: string;
+  blobId: string;
+  objectId: string;
+}
+
 
 // 其他類型定義...
