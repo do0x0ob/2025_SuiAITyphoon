@@ -324,10 +324,8 @@ export default function Home() {
                           handleWindowActivate('memento-create');
                         }}
                         onCaptureMoment={() => {
-                          // 獲取 Memento 窗口的位置
                           const mementoPos = windowPositions.memento;
                           const mementoSize = windowSizes.memento;
-                          // 設置新窗口位置在 Memento 右側偏上
                           setWindowPositions(prev => ({
                             ...prev,
                             'capture-moment': {

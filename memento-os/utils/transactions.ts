@@ -2,8 +2,8 @@ import { bcs } from "@mysten/sui/bcs";
 import { Transaction as TX } from "@mysten/sui/transactions";
 
 // 修改常量定義，加上 export
-export const PACKAGE_ID = '0x370332371f5d6119d32e6a36ba231faea4627649280dd60722a51724c60effc2';
-export const STATE_ID = '0x9b70b65015f554caef63cd94b3f2bc6bd6b2e2bd6dbb7b187894a260f108c25a';
+export const PACKAGE_ID = '0x0d770311943b62d983795874dc490b1dde5519d81070c37b75422139a6411011';
+export const STATE_ID = '0x8f1361249afeafb4667f2cd97efb0b4a4d71a8cf1fa55259c42017281f5a8f2e';
 
 export const mintOS = async (username: string, settings_blob: string = "") => {
   console.log('mintOS params:', username, settings_blob);
@@ -34,6 +34,25 @@ export const createMemento = async (
       tx.object(osId),  // 臨時使用假值
       tx.pure(bcs.string().serialize(name).toBytes()),
       tx.pure(bcs.string().serialize(blobId).toBytes()),
+    ],
+  });
+  return tx;
+};
+
+export const createMoment = async (
+  osId: string,
+  title: string,
+  description: string,
+  blobId?: string
+) => {
+  const tx = new TX();
+  tx.moveCall({
+    target: `${PACKAGE_ID}::memento::create_moment`,
+    arguments: [
+      tx.object(osId),
+      tx.pure(bcs.string().serialize(title).toBytes()),
+      tx.pure(bcs.string().serialize(description).toBytes()),
+      tx.pure(blobId ? bcs.option(bcs.string()).serialize(blobId).toBytes() : bcs.option(bcs.string()).serialize(null).toBytes()),
     ],
   });
   return tx;

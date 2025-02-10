@@ -13,11 +13,6 @@ module memento::memento {
     
     // == STRUCTS ==
 
-    public struct Memento has store {
-        name: String,
-        blob_id: String,
-    }
-
     public struct State has key {
         id: UID,
         accounts: Table<address, ID>,
@@ -31,6 +26,18 @@ module memento::memento {
         settings_blob_id: String,
         image_url: String,
         mementos: vector<Memento>,
+        moments: vector<Moment>,
+    }
+
+    public struct Memento has store {
+        name: String,
+        blob_id: String,
+    }
+
+    public struct Moment has store {
+        title: String,
+        description: String,
+        image: Option<String>,
     }
 
     // == ONE TIME WITNESS ==
@@ -49,6 +56,13 @@ module memento::memento {
         os_id: ID,
         name: String,
         blob_id: String,
+    }
+
+    public struct MomentCreated has copy, drop {
+        os_id: ID,
+        title: String,
+        description: String,
+        image: Option<String>,
     }
 
     // == INITIALIZATION ==
@@ -104,6 +118,7 @@ module memento::memento {
             settings_blob_id: settings_blob,
             image_url: b"jBwMThR7sKzyZAeuDla4lPSJ-AW4f6irNQKsY3OdwwU".to_string(),    
             mementos: vector::empty(),
+            moments: vector::empty(),
         };
 
         let id_copy = object::uid_to_inner(&os.id);
@@ -140,6 +155,32 @@ module memento::memento {
             os_id: object::uid_to_inner(&os.id),
             name,
             blob_id,
+        });
+    }
+
+    public entry fun create_moment(
+        os: &mut OS,
+        title: String,
+        description: String,
+        image: Option<String>,
+        ctx: &mut TxContext
+    ) {
+        let sender = tx_context::sender(ctx);
+        assert!(os.owner == sender, 0);
+
+        let moment = Moment {
+            title,
+            description,
+            image,
+        };
+
+        vector::push_back(&mut os.moments, moment); 
+
+        event::emit(MomentCreated {
+            os_id: object::uid_to_inner(&os.id),
+            title,
+            description,
+            image,
         });
     }
 }
