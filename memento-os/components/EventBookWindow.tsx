@@ -90,16 +90,7 @@ const EventBookWindow: React.FC<EventBookWindowProps> = ({ osId, onOpenImageView
             {moments.map((moment, index) => (
               <div 
                 key={index} 
-                className={`border border-black/10 p-4 space-y-3 relative ${
-                  moment.blobId 
-                    ? 'hover:bg-black/5 transition-colors cursor-pointer' 
-                    : 'opacity-50 cursor-not-allowed'
-                }`}
-                onClick={() => {
-                  if (moment.blobId && moment.image && onOpenImageView) {
-                    onOpenImageView(moment.image, moment.title);
-                  }
-                }}
+                className="border border-black/10 p-4 space-y-3 relative"
               >
                 {moment.image && (
                   <div className="aspect-video relative overflow-hidden bg-black/5">

@@ -295,11 +295,11 @@ export default function Home() {
                 onClick={() => handleOpenWindow("walrusview")}
                 icon="📥"
               />
-              <DesktopIcon
+              {/* <DesktopIcon
                 label="Help"
                 onClick={() => handleOpenWindow("help")}
                 icon="❓"
-              />
+              /> */}
             </div>
 
             {/* 底部圖標 */}
@@ -434,9 +434,52 @@ export default function Home() {
                       onResize={handleResize}
                       onClick={() => handleWindowActivate('help')}
                     >
-                      <div className="p-4">
-                        <h2 className="text-xl font-medium mb-4">Help</h2>
-                        {/* Help 內容 */}
+                      <div className="p-6 space-y-6">
+                        <section className="space-y-2">
+                          <h2 className="text-xl font-medium">Welcome to Memento OS</h2>
+                          <p className="text-sm text-gray-600">
+                            A decentralized operating system for preserving your precious moments.
+                          </p>
+                        </section>
+
+                        <section className="space-y-4">
+                          <div className="space-y-2">
+                            <h3 className="font-medium">Core Features</h3>
+                            <div className="space-y-3 text-sm">
+                              <div>
+                                <p className="font-medium">✨ Create Memento</p>
+                                <p className="text-gray-600 ml-4">Create a dedicated space to preserve memories of your loved ones.</p>
+                              </div>
+                              <div>
+                                <p className="font-medium">📱 Phone Book</p>
+                                <p className="text-gray-600 ml-4">Start a conversation to those who you thought you'd never see again, deliver your memorials to them.</p>
+                              </div>
+                            </div>
+                              <div>
+                                <p className="font-medium">📸 Capture Moment</p>
+                                <p className="text-gray-600 ml-4">Save your memories with text and images on the blockchain.</p>
+                              </div>
+                              <div>
+                                <p className="font-medium">📖 Event Book</p>
+                                <p className="text-gray-600 ml-4">Browse through all your captured moments in chronological order.</p>
+                              </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <h3 className="font-medium">Quick Tips</h3>
+                            <ul className="space-y-2 text-sm text-gray-600 ml-4">
+                              <li>• Click on window headers to drag them around</li>
+                              <li>• Use the copy button in Event Book to save moment details</li>
+                              <li>• Windows can be resized from the bottom-right corner</li>
+                              <li>• Connect your wallet to start capturing moments</li>
+                            </ul>
+                          </div>
+                        </section>
+
+                        <section className="text-xs text-gray-500 pt-4">
+                          <p>Version 1.0.0</p>
+                          <p>Built with ❤️ on Sui Network</p>
+                        </section>
                       </div>
                     </Window>
                   );
