@@ -31,7 +31,7 @@ const defaultWindowSizes = {
   walrusupload: { width: 540, height: 400 },
   walrusview: { width: 365, height: 446 },
   'memento-create': { width: 480, height: 520 },
-  'capture-moment': { width: 480, height: 580 },
+  'capture-moment': { width: 500, height: 580 },
 };
 
 interface WindowState {
