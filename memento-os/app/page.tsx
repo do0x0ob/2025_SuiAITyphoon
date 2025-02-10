@@ -21,12 +21,12 @@ const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
 
 const defaultWindowSizes = {
   memento: { width: 500, height: 600 },
-  phonebook: { width: 800, height: 600 },
+  phonebook: { width: 900, height: 600 },
   eventbook: { width: 400, height: 600 },
-  about: { width: 540, height: 700 },
+  about: { width: 540, height: 800 },
   help: { width: 500, height: 400 },
   walrusupload: { width: 540, height: 400 },
-  walrusview: { width: 540, height: 400 },
+  walrusview: { width: 365, height: 446 },
   'memento-create': { width: 480, height: 520 },
 };
 
@@ -134,8 +134,14 @@ export default function Home() {
     const handleMouseMove = (e: MouseEvent) => {
       const windowWidth = windowSizes[windowName as WindowName].width;
       const windowHeight = windowSizes[windowName as WindowName].height;
-      const newX = Math.max(0, Math.min(e.clientX - offsetX, window.innerWidth - windowWidth));
-      const newY = Math.max(0, Math.min(e.clientY - offsetY, window.innerHeight - windowHeight));
+      
+      // 修改這裡：使用 document.documentElement.clientWidth 而不是 window.innerWidth
+      const maxX = document.documentElement.clientWidth - windowWidth;
+      const maxY = document.documentElement.clientHeight - windowHeight - 48; // 減去 header 高度
+      
+      const newX = Math.max(0, Math.min(e.clientX - offsetX, maxX));
+      const newY = Math.max(0, Math.min(e.clientY - offsetY, maxY));
+      
       setWindowPositions(prev => ({...prev, [windowName as WindowName]: { x: newX, y: newY }}));
     };
 

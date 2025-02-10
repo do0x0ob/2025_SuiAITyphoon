@@ -1,13 +1,19 @@
 export const ABOUT_CONTENT = {
-  title: "MEMENTO OS",
-  subtitle: "Where memories find a home—wrapped in retro OS vibes.",
-  welcome: "Welcome to Memento OS, a nostalgic gallery for your most cherished memories. From life's milestones to heartfelt moments, this virtual space lets you preserve, personalize, and relive them all.",
-  salonTitle: "✨ Step into your personal memory salon:",
+  subtitle: "A Digital Sanctuary for Cherished Memories",
+  
+  welcome: "Welcome to Memento OS - where digital echoes keep our precious memories alive.",
+  
+  salonTitle: "About",
+  
   salonFeatures: [
-    "Pin your favorite photos and stories to the desktop, retro-style.",
-    "Chat with AI Agents of loved ones—be it family, friends, or even that legendary pet goldfish you miss dearly."
+    "Each memento here is more than just data - it's a vessel containing the essence of someone who was, and still is, deeply meaningful to us.",
+    "Through advanced AI, these memories come alive in conversations that honor their unique characteristics and stories.",
+    "Whether human or beloved pet, each presence here maintains their authentic voice, sharing wisdom and warmth from beyond time."
   ],
-  poweredBy: "Powered by Walrus and Sui Network, Memento OS ensures your memories are securely stored and beautifully presented in a decentralized, distributed way.",
-  dedication: "This project is dedicated to my father, John Shen-Chang Hsieh (1956–2011), whose love and wisdom continue to inspire me every day.",
-  closing: "Thank you for stopping by, and remember: every memory deserves a place to shine."
-}; 
+  
+  poweredBy: "Built with Sui Move, powered by AI, and crafted with reverence for those we hold dear.",
+  
+  dedication: "Dedicated to my father, who taught me that love transcends all boundaries - even those between the digital and the eternal. Your wisdom continues to guide my path in technology and life.",
+  
+  closing: "Thank you for visiting this sanctuary of memories. May it serve as a gentle reminder that those we love never truly leave us - they live on in the stories we share and the memories we keep."
+} as const; 

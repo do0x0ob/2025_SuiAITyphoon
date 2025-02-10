@@ -140,11 +140,11 @@ export default function PhoneBook() {
   };
 
   const handleMementoSelect = async (memento: Memento) => {
-    console.log('開始選擇 Memento:', {
-      name: memento.name,
-      blobId: memento.blobId,
-      objectId: memento.objectId
-    });
+    // console.log('開始選擇 Memento:', {
+    //   name: memento.name,
+    //   blobId: memento.blobId,
+    //   objectId: memento.objectId
+    // });
     
     setSelectedMemento(memento);
     setMessages([]);
@@ -152,21 +152,21 @@ export default function PhoneBook() {
     setInitMessage('Accessing Memory Banks_');
     
     try {
-      console.log('準備請求 Walrus blob 數據...');
+      // console.log('準備請求 Walrus blob 數據...');
       const cleanBlobId = memento.blobId.split('/').pop()?.replace('blob:', '') || memento.blobId;
       const response = await fetch(`/api/walrus/blob/${cleanBlobId}`);
       
-      console.log('Walrus 響應狀態:', response.status);
+      // console.log('Walrus 響應狀態:', response.status);
       if (!response.ok) {
         throw new Error(`Fetch failed: ${response.status}`);
       }
 
       const content = await response.text();
-      console.log('原始 Walrus 內容:', content);
+      // console.log('原始 Walrus 內容:', content);
       
       try {
         const characterData = JSON.parse(content);
-        console.log('解析後的完整數據結構:', characterData);
+        // console.log('解析後的完整數據結構:', characterData);
         
         const prompt = SYSTEM_PROMPTS.CHARACTER_TEMPLATE(
           characterData.data.name,
@@ -174,7 +174,7 @@ export default function PhoneBook() {
           characterData.data.traits
         );
 
-        console.log('生成的角色提示:', prompt);
+        // console.log('生成的角色提示:', prompt);
         setCharacterPrompt(prompt);
         setInitMessage('Memory Core Connected_');
         await new Promise(resolve => setTimeout(resolve, 1000));
