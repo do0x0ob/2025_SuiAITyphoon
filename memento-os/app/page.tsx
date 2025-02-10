@@ -484,9 +484,10 @@ export default function Home() {
                 position={windowPositions['memento-create']}
                 size={windowSizes['memento-create']}
                 isActive={activeWindow === 'memento-create'}
-                resizable={false}
+                resizable={true}
                 onClose={() => setIsCreateMementoOpen(false)}
                 onDragStart={handleDragStart}
+                onResize={handleResize}
                 onClick={() => handleWindowActivate('memento-create')}
               >
                 <CreateMementoDialog
