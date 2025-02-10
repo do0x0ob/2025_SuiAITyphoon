@@ -117,7 +117,7 @@ export default function CreateMementoDialog({
     try {
       setStatus({
         type: 'uploading-metadata',
-        message: 'Collecting memory fragments...'
+        message: 'Collecting memory fragments'
       });
 
       // 1. 準備 metadata
@@ -152,7 +152,7 @@ export default function CreateMementoDialog({
       const result = await response.json();
       console.log('Walrus 上傳成功:', result);
 
-      // 修改這裡：正確的 blobId 路徑
+      // ：正確的 blobId 路徑
       const blobId = result.newlyCreated?.blobObject?.blobId;
       if (!blobId) {
         throw new Error('Failed to get blobId from response');
@@ -163,7 +163,7 @@ export default function CreateMementoDialog({
       // 3. 獲取 OS object id
       setStatus({
         type: 'uploading-metadata',
-        message: 'Weaving memories into eternity...'
+        message: 'Weaving memories into eternity'
       });
 
       const osId = await getOSObjectId(currentAddress);
@@ -177,7 +177,7 @@ export default function CreateMementoDialog({
 
       const tx = await createMemento(osId, data.name.trim(), blobId);
       
-      await signAndExecuteTransaction({
+      signAndExecuteTransaction({
         transaction: tx,
         chain: 'sui:testnet'
       }, {
@@ -215,7 +215,8 @@ export default function CreateMementoDialog({
           {(status.type === 'uploading-metadata' || status.type === 'uploading-chain') && (
             <div className="flex items-center gap-2">
               <span className="animate-pulse">{`>`}</span>
-              <span className="animate-typing">{status.message}</span>
+              <span>{status.message}</span>
+              <span className="animate-blink">_</span>
             </div>
           )}
           

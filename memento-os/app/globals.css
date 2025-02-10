@@ -21,6 +21,13 @@
   animation: blink 1s step-end infinite;
 }
 
+.animate-typing {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typing 2s steps(40, end);
+}
+
 .cursor-blink {
   display: inline-block;
   margin-left: 2px;
