@@ -6,4 +6,5 @@ export type WindowName =
   | 'help' 
   | 'walrusupload' 
   | 'walrusview'
-  | 'memento-create'; 
+  | 'memento-create'
+  | 'capture-moment'; 

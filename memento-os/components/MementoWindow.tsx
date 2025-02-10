@@ -14,9 +14,10 @@ const OS_TYPE = `${PACKAGE_ID}::memento::OS`;
 interface MementoWindowProps {
   onDragStart: (e: React.MouseEvent<Element>, name: WindowName) => void;
   onCreateMemento: () => void;
+  onCaptureMoment: () => void;
 }
 
-export default function MementoWindow({ onDragStart, onCreateMemento }: MementoWindowProps) {
+export default function MementoWindow({ onDragStart, onCreateMemento, onCaptureMoment }: MementoWindowProps) {
   const currentAccount = useCurrentAccount();
   const suiClient = useSuiClient();
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('disconnected');
@@ -157,10 +158,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
     setIsMinting(false);
     setDigest('');
     setUsername('');
-  };
-
-  const handleCreateEvent = () => {
-    console.log('Creating new event...', currentAccount?.address);
   };
 
   // 處理 Memento 創建
@@ -313,10 +310,10 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
 
             <div className="mt-8 flex justify-center gap-4">
               <button
-                onClick={handleCreateEvent}
+                onClick={onCaptureMoment}
                 className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
               >
-                Capture Memory
+                Capture the Moment
               </button>
               <button
                 onClick={onCreateMemento}

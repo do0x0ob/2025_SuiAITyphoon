@@ -13,6 +13,7 @@ import AboutContent from '@/components/AboutContent';
 import MementoWindow from '@/components/MementoWindow';
 import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDialog';
 import { useSuiClient, useCurrentAccount } from '@mysten/dapp-kit';
+import CaptureMomentWindow from '@/components/CaptureMomentWindow';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -28,6 +29,7 @@ const defaultWindowSizes = {
   walrusupload: { width: 540, height: 400 },
   walrusview: { width: 365, height: 446 },
   'memento-create': { width: 480, height: 520 },
+  'capture-moment': { width: 480, height: 520 },
 };
 
 interface WindowState {
@@ -67,6 +69,7 @@ export default function Home() {
     walrusupload: { x: 350, y: 350 },
     walrusview: { x: 400, y: 400 },
     'memento-create': { x: 250, y: 250 },
+    'capture-moment': { x: 250, y: 250 },
   });
   const [windowSizes, setWindowSizes] = useState(defaultWindowSizes);
   const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
@@ -319,7 +322,23 @@ export default function Home() {
                           
                           setIsCreateMementoOpen(true);
                           handleWindowActivate('memento-create');
-                        }} 
+                        }}
+                        onCaptureMoment={() => {
+                          console.log('Capturing moment...');
+                          // 獲取 Memento 窗口的位置
+                          const mementoPos = windowPositions.memento;
+                          const mementoSize = windowSizes.memento;
+                          // 設置新窗口位置在 Memento 右側偏上
+                          setWindowPositions(prev => ({
+                            ...prev,
+                            'capture-moment': {
+                              x: mementoPos.x + mementoSize.width + 20,
+                              y: mementoPos.y,
+                            }
+                          }));
+                          
+                          handleWindowActivate('capture-moment');
+                        }}
                       />
                     </Window>
                   );
@@ -437,10 +456,27 @@ export default function Home() {
                       <WalrusView />
                     </Window>
                   );
+                case 'capture-moment':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Capture Moment"
+                      position={windowPositions['capture-moment']}
+                      size={windowSizes['capture-moment']}
+                      isActive={activeWindow === 'capture-moment'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('capture-moment')}
+                    >
+                      <CaptureMomentWindow />
+                    </Window>
+                  );
               }
             })}
 
-            {/* 將 CreateMementoDialog 移到這裡 */}
             {isCreateMementoOpen && (
               <Window
                 key="memento-create"
