@@ -27,6 +27,15 @@ interface MementoMetadata {
   };
 }
 
+// 擴展狀態類型
+type StatusType = 'idle' | 'uploading-metadata' | 'uploading-chain' | 'success' | 'error';
+
+interface StatusState {
+  type: StatusType;
+  message: string;
+  digest?: string;
+}
+
 export default function CreateMementoDialog({ 
   isOpen, 
   onClose, 
@@ -62,11 +71,8 @@ export default function CreateMementoDialog({
   // 修改 traits 處理方法
   const [traitsInput, setTraitsInput] = useState('');  // 新增狀態來存儲原始輸入
 
-  // 添加狀態管理
-  const [status, setStatus] = useState<{
-    type: 'idle' | 'uploading' | 'success' | 'error';
-    message: string;
-  }>({
+  // 更新狀態定義
+  const [status, setStatus] = useState<StatusState>({
     type: 'idle',
     message: ''
   });
@@ -110,8 +116,8 @@ export default function CreateMementoDialog({
 
     try {
       setStatus({
-        type: 'uploading',
-        message: 'Uploading metadata to Walrus...'
+        type: 'uploading-metadata',
+        message: 'Collecting memory fragments...'
       });
 
       // 1. 準備 metadata
@@ -156,8 +162,8 @@ export default function CreateMementoDialog({
 
       // 3. 獲取 OS object id
       setStatus({
-        type: 'uploading',
-        message: 'Getting OS object...'
+        type: 'uploading-metadata',
+        message: 'Weaving memories into eternity...'
       });
 
       const osId = await getOSObjectId(currentAddress);
@@ -165,8 +171,8 @@ export default function CreateMementoDialog({
 
       // 4. 調用 createMemento transaction
       setStatus({
-        type: 'uploading',
-        message: 'Creating memento on-chain...'
+        type: 'uploading-chain',
+        message: 'Inscribing memories onto the eternal chain...'
       });
 
       const tx = await createMemento(osId, data.name.trim(), blobId);
@@ -176,35 +182,69 @@ export default function CreateMementoDialog({
         chain: 'sui:testnet'
       }, {
         onSuccess: (result) => {
-          console.log('交易成功:', result);
+          console.log('Transaction successful:', result);
           setStatus({
             type: 'success',
-            message: `Memento created successfully! Digest: ${result.digest}`
-          });
-          
-          onSubmit({
-            ...data,
-            name: data.name.trim(),
-            description: data.description.trim(),
-            traits: data.traits.filter(Boolean)
+            message: 'Memory preserved forever',
+            digest: result.digest
           });
         },
         onError: (error) => {
-          console.error('交易失敗:', error);
           setStatus({
             type: 'error',
-            message: error instanceof Error ? error.message : 'Transaction failed'
+            message: 'Failed to preserve memory. Please try again.'
           });
         }
       });
 
     } catch (error) {
-      console.error('建立 Memento 失敗:', error);
       setStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: 'Failed to collect memory fragments. Please try again.'
       });
     }
+  };
+
+  // 渲染狀態提示
+  const renderStatus = () => {
+    if (status.type === 'idle') return null;
+
+    return (
+      <div className="text-sm font-mono">
+        <div className="flex items-center gap-2">
+          {(status.type === 'uploading-metadata' || status.type === 'uploading-chain') && (
+            <div className="flex items-center gap-2">
+              <span className="animate-pulse">{`>`}</span>
+              <span className="animate-typing">{status.message}</span>
+            </div>
+          )}
+          
+          {status.type === 'success' && (
+            <div className="space-y-2">
+              <div className="text-green-700">
+                <span>{`>`} {status.message}</span>
+                <span className="animate-blink">_</span>
+              </div>
+              {status.digest && (
+                <div className="text-xs">
+                  <div className="text-gray-600">Transaction Digest:</div>
+                  <div className="font-mono break-all text-gray-800 bg-black/5 p-2 mt-1">
+                    {status.digest}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {status.type === 'error' && (
+            <div className="text-red-700">
+              <span>! {status.message}</span>
+              <span className="animate-blink">_</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (!isOpen) return null;
@@ -221,6 +261,7 @@ export default function CreateMementoDialog({
             onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}
             className="w-full px-3 py-1.5 border border-black/80 bg-white focus:outline-none"
             placeholder="Enter memento name..."
+            disabled={status.type === 'success' || status.type === 'uploading-metadata' || status.type === 'uploading-chain'}
           />
         </div>
 
@@ -232,6 +273,7 @@ export default function CreateMementoDialog({
             onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
             className="w-full h-32 px-3 py-1.5 border border-black/80 bg-white focus:outline-none resize-none"
             placeholder="Describe your memento's personality and background..."
+            disabled={status.type === 'success' || status.type === 'uploading-metadata' || status.type === 'uploading-chain'}
           />
         </div>
 
@@ -244,37 +286,24 @@ export default function CreateMementoDialog({
             onChange={handleTraitsChange}
             className="w-full px-3 py-1.5 border border-black/80 bg-white focus:outline-none"
             placeholder="friendly, creative, curious..."
+            disabled={status.type === 'success' || status.type === 'uploading-metadata' || status.type === 'uploading-chain'}
           />
         </div>
 
-        {/* 狀態顯示區域 - 移除分隔線效果 */}
-        {status.type !== 'idle' && (
-          <div className="text-sm">
-            <div className="flex items-center gap-2">
-              {status.type === 'uploading' && (
-                <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin" />
-              )}
-              <span className={`${
-                status.type === 'uploading' ? 'text-blue-700' :
-                status.type === 'success' ? 'text-green-700' :
-                'text-red-700'
-              }`}>
-                {status.message}
-              </span>
-            </div>
+        {renderStatus()}
+
+        {/* 按鈕區域 - 根據狀態隱藏 */}
+        {status.type !== 'success' && (
+          <div className="flex justify-end">
+            <button
+              onClick={handleSubmit}
+              disabled={!data.name.trim() || status.type === 'uploading-metadata' || status.type === 'uploading-chain'}
+              className="px-4 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {status.type === 'uploading-metadata' || status.type === 'uploading-chain' ? 'Creating...' : 'Create'}
+            </button>
           </div>
         )}
-
-        {/* 按鈕區域 */}
-        <div className="flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={!data.name.trim() || status.type === 'uploading'}
-            className="px-4 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {status.type === 'uploading' ? 'Creating...' : 'Create'}
-          </button>
-        </div>
       </div>
     </div>
   );
