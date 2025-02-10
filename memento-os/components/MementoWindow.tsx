@@ -335,6 +335,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
         isOpen={isCreateMementoOpen}
         onClose={() => setIsCreateMementoOpen(false)}
         onSubmit={handleCreateMemento}
+        currentAddress={currentAccount?.address}
       />
     </div>
   );
