@@ -9,6 +9,7 @@ interface CaptureMomentWindowProps {
 const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'uploading' | 'creating' | 'done'>('idle');
@@ -74,6 +75,7 @@ const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
         osId,
         title,
         description,
+        date,
         blobId,
       });
       
@@ -82,6 +84,7 @@ const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
         osId,
         title,
         description,
+        date,
         blobId
       );
 
@@ -101,6 +104,7 @@ const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
               // 清空表單
               setTitle('');
               setDescription('');
+              setDate('');
               setFile(null);
             },
             onError: (error) => {
@@ -147,6 +151,18 @@ const CaptureMomentWindow: React.FC<CaptureMomentWindowProps> = ({ osId }) => {
               onChange={(e) => setDescription(e.target.value)}
               className="px-3 py-2 border border-black/80 bg-white/70 h-24 focus:outline-none focus:ring-2 focus:ring-black/20"
               placeholder="What's special about this moment?"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium">Date *</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="px-3 py-2 border border-black/80 bg-white/70 focus:outline-none focus:ring-2 focus:ring-black/20"
+              placeholder="When did this moment happen?"
+              required
             />
           </div>
 
