@@ -19,6 +19,25 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
     traits: []
   });
 
+  // 修改 traits 處理方法
+  const [traitsInput, setTraitsInput] = useState('');  // 新增狀態來存儲原始輸入
+
+  const handleTraitsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTraitsInput(value);  // 保存原始輸入
+
+    // 當輸入逗號時，更新 traits 數組
+    if (value.includes(',')) {
+      const newTraits = value
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+      setData(prev => ({ ...prev, traits: newTraits }));
+    } else {
+      setData(prev => ({ ...prev, traits: value ? [value] : [] }));
+    }
+  };
+
   const handleSubmit = () => {
     if (data.name.trim()) {
       onSubmit(data);
@@ -54,29 +73,20 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
           />
         </div>
 
-        {/* 特質輸入 */}
+        {/* 特質輸入 - 修改後的版本 */}
         <div>
-          <div className="text-sm text-gray-600 mb-1">Traits (comma separated):</div>
+          <div className="text-sm text-gray-600 mb-1">Traits (separate with comma):</div>
           <input
             type="text"
-            value={data.traits.join(', ')}
-            onChange={(e) => setData(prev => ({ 
-              ...prev, 
-              traits: e.target.value.split(',').map(t => t.trim()).filter(Boolean)
-            }))}
+            value={traitsInput}  // 使用 traitsInput 而不是 traits.join(',')
+            onChange={handleTraitsChange}
             className="w-full px-3 py-1.5 border border-black/80 bg-white/70 focus:outline-none focus:bg-white/90"
             placeholder="friendly, creative, curious..."
           />
         </div>
 
-        {/* 按鈕 */}
-        <div className="flex justify-end gap-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 border border-black hover:bg-black/5"
-          >
-            Cancel
-          </button>
+        {/* 只保留 Create 按鈕 */}
+        <div className="flex justify-end mt-6">
           <button
             onClick={handleSubmit}
             disabled={!data.name.trim()}
