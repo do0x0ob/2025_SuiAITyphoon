@@ -31,10 +31,10 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
   
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
-  // 將 checkNFTOwnership 提取出來以便重用
   const checkNFTOwnership = async () => {
     if (!currentAccount) {
       setWalletStatus('disconnected');
+      setIsMinting(false);
       return;
     }
 
@@ -51,12 +51,17 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
 
       if (objects && objects.length > 0) {
         setWalletStatus('connected-with-nft');
+        setIsMinting(false);
+        return true;
       } else {
         setWalletStatus('connected-no-nft');
+        return false;
       }
     } catch (error) {
       console.error('Error checking NFT ownership:', error);
       setWalletStatus('connected-no-nft');
+      setIsMinting(false);
+      return false;
     }
   };
 
@@ -76,7 +81,25 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
           onSuccess: async (result) => {
             console.log("Transaction successful:", result);
             setDigest(result.digest);
-            await checkNFTOwnership();
+            
+            // 交易成功後等待 2 秒再檢查一次
+            setTimeout(async () => {
+              const hasNFT = await checkNFTOwnership();
+              
+              // 如果第一次檢查沒找到 NFT，最多再重試 3 次
+              if (!hasNFT) {
+                let attempts = 0;
+                const maxAttempts = 3;
+                const retryInterval = setInterval(async () => {
+                  const found = await checkNFTOwnership();
+                  attempts++;
+                  
+                  if (found || attempts >= maxAttempts) {
+                    clearInterval(retryInterval);
+                  }
+                }, 2000);
+              }
+            }, 2000);
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
@@ -90,46 +113,8 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
     }
   };
 
-  // 定期檢查 NFT 所有權
   useEffect(() => {
-    const checkNFTOwnership = async () => {
-      if (!currentAccount) {
-        setWalletStatus('disconnected');
-        setIsMinting(false); // 重置 minting 狀態
-        return;
-      }
-
-      try {
-        const { data: objects } = await suiClient.getOwnedObjects({
-          owner: currentAccount.address,
-          filter: {
-            StructType: OS_TYPE
-          },
-          options: {
-            showType: true,
-          }
-        });
-
-        if (objects && objects.length > 0) {
-          setWalletStatus('connected-with-nft');
-          setIsMinting(false); // 重置 minting 狀態
-        } else {
-          setWalletStatus('connected-no-nft');
-        }
-      } catch (error) {
-        console.error('Error checking NFT ownership:', error);
-        setWalletStatus('connected-no-nft');
-        setIsMinting(false); // 重置 minting 狀態
-      }
-    };
-
-    // 初始檢查
     checkNFTOwnership();
-
-    // 設置定期檢查
-    const intervalId = setInterval(checkNFTOwnership, 3000);
-
-    return () => clearInterval(intervalId);
   }, [currentAccount, suiClient]);
 
   // 添加鍵盤事件監聽

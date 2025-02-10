@@ -12,6 +12,18 @@ export interface MementoData {
   traits: string[];      // 關鍵特質（可選）
 }
 
+// AI Agent 用的資料結構
+interface MementoMetadata {
+  version: '1.0';
+  type: 'memento';
+  data: {
+    name: string;
+    description: string;
+    traits: string[];
+    createdAt: string;
+  };
+}
+
 export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: CreateMementoDialogProps) {
   const [data, setData] = useState<MementoData>({
     name: '',
@@ -38,10 +50,62 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
     }
   };
 
-  const handleSubmit = () => {
-    if (data.name.trim()) {
-      onSubmit(data);
+  const handleSubmit = async () => {
+    if (!data.name.trim()) return;
+
+    try {
+      console.log('開始建立 Memento...');
+      
+      // 1. 準備 metadata
+      const metadata: MementoMetadata = {
+        version: '1.0',
+        type: 'memento',
+        data: {
+          name: data.name.trim(),
+          description: data.description.trim(),
+          traits: data.traits.filter(Boolean),
+          createdAt: new Date().toISOString(),
+        }
+      };
+
+      console.log('準備的 metadata:', metadata);
+
+      // 2. 轉換為 Buffer
+      const metadataString = JSON.stringify(metadata, null, 2);
+      const metadataBuffer = Buffer.from(metadataString, 'utf-8');
+
+      // 3. 上傳到 Walrus
+      const formData = new FormData();
+      const blob = new Blob([metadataBuffer], { type: 'application/json' });
+      formData.append('data', blob, 'memento.json');
+      formData.append('epochs', '100');
+
+      console.log('開始上傳到 Walrus...');
+      
+      const response = await fetch('/api/walrus', {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Walrus 上傳成功:', result);
+
+      // 4. 調用 onSubmit 並關閉對話框
+      onSubmit({
+        ...data,
+        name: data.name.trim(),
+        description: data.description.trim(),
+        traits: data.traits.filter(Boolean)
+      });
+      
       onClose();
+    } catch (error) {
+      console.error('建立 Memento 失敗:', error);
+      // TODO: 添加錯誤提示 UI
     }
   };
 
