@@ -4,7 +4,7 @@ import { walrusApi } from '@/services/walrusApi';
 export async function PUT(req: Request) {
   try {
     const formData = await req.formData();
-    const result = await walrusApi.handleFileUpload(formData, 'PUT');
+    const result = await walrusApi.handleFileUpload(formData);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Upload Error:', error);
