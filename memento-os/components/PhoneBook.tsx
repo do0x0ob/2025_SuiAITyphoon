@@ -16,6 +16,9 @@ export default function PhoneBook() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const atomaApi = new AtomaApiService();
   const [selectedMemento, setSelectedMemento] = useState<Memento | null>(null);
+  const [characterPrompt, setCharacterPrompt] = useState<string>('');
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [initMessage, setInitMessage] = useState('');
 
   // 使用 hook 查詢 OS object
   const { data: osObjects } = useSuiClientQuery(
@@ -89,20 +92,36 @@ export default function PhoneBook() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    console.log('提交檢查:', {
+      hasInput: !!input.trim(),
+      isLoading,
+      hasSelectedMemento: !!selectedMemento,
+      hasCharacterPrompt: !!characterPrompt
+    });
+
+    if (!input.trim() || isLoading || !selectedMemento || !characterPrompt) {
+      console.log('提交被阻止，條件不滿足');
+      return;
+    }
 
     setIsLoading(true);
     const userMessage = input.trim();
     setInput('');
 
     try {
-      console.log('Sending message:', userMessage);
+      console.log('開始發送消息:', {
+        characterPrompt,
+        userMessage,
+        messagesCount: messages.length
+      });
+
       const response = await atomaApi.createChatCompletion([
-        { role: 'system', content: SYSTEM_PROMPTS.PRIME_GENERATOR },
+        { role: 'system', content: characterPrompt },
         ...messages,
         { role: 'user', content: userMessage }
       ]);
-      console.log('API Response:', response);
+      
+      console.log('收到 API 響應:', response);
 
       if (response.choices[0]?.message) {
         setMessages(prev => [
@@ -110,29 +129,66 @@ export default function PhoneBook() {
           { role: 'user', content: userMessage },
           { role: 'assistant', content: response.choices[0].message!.content }
         ]);
+        console.log('消息已更新到對話中');
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('發送消息失敗:', error);
     } finally {
       setIsLoading(false);
+      console.log('發送狀態已重置');
     }
   };
 
   const handleMementoSelect = async (memento: Memento) => {
-    console.log('Selected memento:', memento);
+    console.log('開始選擇 Memento:', {
+      name: memento.name,
+      blobId: memento.blobId,
+      objectId: memento.objectId
+    });
+    
     setSelectedMemento(memento);
+    setMessages([]);
+    setIsInitializing(true);
+    setInitMessage('Accessing Memory Banks_');
     
     try {
-      const response = await fetch(`/api/walrus/${memento.blobId}`);
-      if (!response.ok) throw new Error('Failed to fetch memento data');
+      console.log('準備請求 Walrus blob 數據...');
+      const cleanBlobId = memento.blobId.split('/').pop()?.replace('blob:', '') || memento.blobId;
+      const response = await fetch(`/api/walrus/blob/${cleanBlobId}`);
       
-      const mementoData = await response.json();
-      console.log('Memento data from Walrus:', mementoData);
+      console.log('Walrus 響應狀態:', response.status);
+      if (!response.ok) {
+        throw new Error(`Fetch failed: ${response.status}`);
+      }
+
+      const content = await response.text();
+      console.log('原始 Walrus 內容:', content);
       
-      // TODO: 將這個數據作為系統提示發送給 Atoma
-      // 先打印出來看看數據結構
+      try {
+        const characterData = JSON.parse(content);
+        console.log('解析後的完整數據結構:', characterData);
+        
+        const prompt = SYSTEM_PROMPTS.CHARACTER_TEMPLATE(
+          characterData.data.name,
+          characterData.data.description,
+          characterData.data.traits
+        );
+
+        console.log('生成的角色提示:', prompt);
+        setCharacterPrompt(prompt);
+        setInitMessage('Memory Core Connected_');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('JSON 解析或處理失敗:', error);
+        setCharacterPrompt('');
+        setInitMessage('Memory Access Failed_');
+      }
     } catch (error) {
-      console.error('Error fetching memento data:', error);
+      console.error('獲取 Walrus 數據失敗:', error);
+      setCharacterPrompt('');
+      setInitMessage('Connection Failed_');
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -155,7 +211,7 @@ export default function PhoneBook() {
                     blobId: memento.blobId,
                     objectId: memento.objectId
                   });
-                  setSelectedMemento(memento);
+                  handleMementoSelect(memento);
                 }}
               >
                 <span className={`${
@@ -172,31 +228,40 @@ export default function PhoneBook() {
 
       {/* 右側聊天區域 */}
       <div className="flex-1 flex flex-col min-w-[600px]">
-        <div 
-          className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-black/20 scrollbar-track-transparent"
-        >
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`${
-                  message.role === 'user' 
-                    ? 'bg-black/5'
-                    : 'bg-black/5'
-                } inline-block max-w-[80%] rounded p-3`}
-              >
-                <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-              </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-black/20 scrollbar-track-transparent">
+          {isInitializing ? (
+            <div className="flex items-center justify-center h-full">
+              <span className="font-mono text-lg">
+                {initMessage}
+                <span className="animate-pulse">█</span>
+              </span>
             </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-end">
-              <div className="bg-black/5 inline-block max-w-[80%] rounded p-3">
-                <p className="text-sm">Typing...</p>
-              </div>
-            </div>
+          ) : (
+            <>
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`${
+                      message.role === 'user' 
+                        ? 'bg-black/5'
+                        : 'bg-black/5'
+                    } inline-block max-w-[80%] rounded p-3`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-end">
+                  <div className="bg-black/5 inline-block max-w-[80%] rounded p-3">
+                    <p className="text-sm">Sending...</p>
+                  </div>
+                </div>
+              )}
+            </>
           )}
           <div ref={messagesEndRef} />
         </div>
@@ -210,10 +275,11 @@ export default function PhoneBook() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
               className="flex-1 px-3 py-1.5 border border-black/80 bg-white/70 focus:outline-none focus:bg-white/90 transition-colors"
+              disabled={isInitializing}
             />
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={!selectedMemento || isLoading || isInitializing}
               className="px-4 py-1.5 bg-black/80 text-white hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Send
