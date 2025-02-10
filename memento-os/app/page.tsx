@@ -324,7 +324,6 @@ export default function Home() {
                           handleWindowActivate('memento-create');
                         }}
                         onCaptureMoment={() => {
-                          console.log('Capturing moment...');
                           // 獲取 Memento 窗口的位置
                           const mementoPos = windowPositions.memento;
                           const mementoSize = windowSizes.memento;
@@ -332,7 +331,7 @@ export default function Home() {
                           setWindowPositions(prev => ({
                             ...prev,
                             'capture-moment': {
-                              x: mementoPos.x + mementoSize.width + 20,
+                              x: mementoPos.x + mementoSize.width - 1000,
                               y: mementoPos.y,
                             }
                           }));

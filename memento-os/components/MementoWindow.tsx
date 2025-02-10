@@ -313,7 +313,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento, onCaptureM
                 onClick={onCaptureMoment}
                 className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
               >
-                Capture the Moment
+                Capture Moments
               </button>
               <button
                 onClick={onCreateMemento}
