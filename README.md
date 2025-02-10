@@ -4,6 +4,10 @@ A digital sanctuary for cherished memories, built with Sui Move and powered by A
 
 ![image](https://github.com/user-attachments/assets/8498fe98-f7ee-4425-ad26-741c2b788391)
 
+## 🚀 Live Demo
+
+Visit [Memento OS](https://memento-os.vercel.app/) to experience the platform.
+
 ## 🌟 Overview
 
 Memento OS is a unique platform that bridges the digital and eternal, allowing users to preserve and interact with memories of those who have touched our lives. Through advanced AI technology, these memories come alive in meaningful conversations while maintaining the authentic essence of each cherished individual or pet.
@@ -14,10 +18,6 @@ Memento OS is a unique platform that bridges the digital and eternal, allowing u
 - **Interactive Conversations**: Engage in AI-powered dialogues that honor the unique characteristics of each memento
 - **Decentralized Storage**: Built on the Sui blockchain for permanence, leveraging Walrus to ensure secure and lasting memory preservation
 - **Walrus Tool**: upload and access photos through an intuitive UI
-
-## 🚀 Live Demo
-
-Visit [Memento OS](https://memento-os.vercel.app/) to experience the platform.
 
 ## 💫 Getting Started (Run Locally)
 
