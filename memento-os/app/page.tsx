@@ -14,6 +14,7 @@ import MementoWindow from '@/components/MementoWindow';
 import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDialog';
 import { useSuiClient, useCurrentAccount } from '@mysten/dapp-kit';
 import CaptureMomentWindow from '@/components/CaptureMomentWindow';
+import { PACKAGE_ID } from '@/utils/transactions';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -42,6 +43,30 @@ interface WindowState {
 export default function Home() {
   const suiClient = useSuiClient();
   const currentAccount = useCurrentAccount();
+  const [currentOsId, setCurrentOsId] = useState<string>('');
+
+  // 獲取用戶的 OS ID
+  useEffect(() => {
+    const fetchOsId = async () => {
+      if (!currentAccount) return;
+      
+      try {
+        const { data: objects } = await suiClient.getOwnedObjects({
+          owner: currentAccount.address,
+          options: { showType: true },
+          filter: { StructType: `${PACKAGE_ID}::memento::OS` }
+        });
+        
+        if (objects && objects[0]) {
+          setCurrentOsId(objects[0].data?.objectId || '');
+        }
+      } catch (error) {
+        console.error('Error fetching OS ID:', error);
+      }
+    };
+
+    fetchOsId();
+  }, [currentAccount, suiClient]);
 
   // 計算視窗中心位置的函數
   const getCenterPosition = (width: number, height: number) => {
@@ -468,7 +493,7 @@ export default function Home() {
                       onResize={handleResize}
                       onClick={() => handleWindowActivate('capture-moment')}
                     >
-                      <CaptureMomentWindow />
+                      <CaptureMomentWindow osId={currentOsId} />
                     </Window>
                   );
               }

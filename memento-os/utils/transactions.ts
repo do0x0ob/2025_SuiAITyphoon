@@ -21,7 +21,7 @@ export const mintOS = async (username: string, settings_blob: string = "") => {
 };
 
 export const createMemento = async (
-  osId: string,  // 臨時使用假值
+  osId: string,
   name: string,
   blobId: string
 ) => {
@@ -31,7 +31,7 @@ export const createMemento = async (
   tx.moveCall({
     target: `${PACKAGE_ID}::memento::create_memento`,
     arguments: [
-      tx.object(osId),  // 臨時使用假值
+      tx.object(osId),
       tx.pure(bcs.string().serialize(name).toBytes()),
       tx.pure(bcs.string().serialize(blobId).toBytes()),
     ],
