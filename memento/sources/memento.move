@@ -38,6 +38,7 @@ module memento::memento {
         title: String,
         description: String,
         image: Option<String>,
+        date: String,
     }
 
     // == ONE TIME WITNESS ==
@@ -63,6 +64,7 @@ module memento::memento {
         title: String,
         description: String,
         image: Option<String>,
+        date: String,
     }
 
     // == INITIALIZATION ==
@@ -163,6 +165,7 @@ module memento::memento {
         title: String,
         description: String,
         image: Option<String>,
+        date: String,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
@@ -172,6 +175,7 @@ module memento::memento {
             title,
             description,
             image,
+            date,
         };
 
         vector::push_back(&mut os.moments, moment); 
@@ -181,6 +185,7 @@ module memento::memento {
             title,
             description,
             image,
+            date,
         });
     }
 }

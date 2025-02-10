@@ -31,7 +31,7 @@ const defaultWindowSizes = {
   walrusupload: { width: 540, height: 400 },
   walrusview: { width: 365, height: 446 },
   'memento-create': { width: 480, height: 520 },
-  'capture-moment': { width: 480, height: 520 },
+  'capture-moment': { width: 500, height: 580 },
 };
 
 interface WindowState {
@@ -80,8 +80,6 @@ export default function Home() {
   };
 
   const mementoSize = { width: 600, height: 600 };
-  const defaultSize = { width: 500, height: 400 };
-  const aboutSize = { width: 540, height: 700 };
 
   const [openWindows, setOpenWindows] = useState<WindowName[]>(['memento']);
   const [activeWindow, setActiveWindow] = useState<WindowName | null>('memento');

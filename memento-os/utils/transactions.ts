@@ -1,8 +1,8 @@
 import { bcs } from "@mysten/sui/bcs";
 import { Transaction as TX } from "@mysten/sui/transactions";
 
-export const PACKAGE_ID = '0x0d770311943b62d983795874dc490b1dde5519d81070c37b75422139a6411011';
-export const STATE_ID = '0x8f1361249afeafb4667f2cd97efb0b4a4d71a8cf1fa55259c42017281f5a8f2e';
+export const PACKAGE_ID = '0x1c806d19711f0a97e35acd652c01e42b5e8a0ddac2d17575780989f33069d317';
+export const STATE_ID = '0x5e33b087a21a6c9d92e3f1f63b21958e31bcb83d3e33cec66a74146e44e1ecab';
 
 export const mintOS = async (username: string, settings_blob: string = "") => {
   console.log('mintOS params:', username, settings_blob);
@@ -42,6 +42,7 @@ export const createMoment = async (
   osId: string,
   title: string,
   description: string,
+  date: string,
   blobId?: string
 ) => {
   const tx = new TX();
@@ -52,6 +53,7 @@ export const createMoment = async (
       tx.pure(bcs.string().serialize(title).toBytes()),
       tx.pure(bcs.string().serialize(description).toBytes()),
       tx.pure(blobId ? bcs.option(bcs.string()).serialize(blobId).toBytes() : bcs.option(bcs.string()).serialize(null).toBytes()),
+      tx.pure(bcs.string().serialize(date).toBytes()),
     ],
   });
   return tx;

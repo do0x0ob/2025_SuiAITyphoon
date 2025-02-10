@@ -7,6 +7,7 @@ interface Moment {
   description: string;
   image?: string;
   blobId?: string;
+  date: string;
 }
 
 interface EventBookWindowProps {
@@ -41,6 +42,7 @@ const EventBookWindow: React.FC<EventBookWindowProps> = ({ osId, onOpenImageView
               title: moment.fields.title,
               description: moment.fields.description,
               blobId: moment.fields.image,
+              date: moment.fields.date,
             };
 
             if (moment.fields.image) {
@@ -102,7 +104,10 @@ const EventBookWindow: React.FC<EventBookWindowProps> = ({ osId, onOpenImageView
                   </div>
                 )}
                 <div>
-                  <h3 className="font-medium">{moment.title}</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">{moment.title}</h3>
+                    <span className="text-xs text-gray-500">{moment.date}</span>
+                  </div>
                   <p className="text-sm text-gray-600 mt-1">{moment.description}</p>
                   <div className="absolute bottom-2 right-2">
                     <button
