@@ -70,18 +70,12 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
 
       console.log('準備的 metadata:', metadata);
 
-      // 2. 轉換為 Buffer
-      const metadataString = JSON.stringify(metadata, null, 2);
-      const metadataBuffer = Buffer.from(metadataString, 'utf-8');
-
-      // 3. 上傳到 Walrus
+      // 2. 上傳到 Walrus
       const formData = new FormData();
-      const blob = new Blob([metadataBuffer], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
       formData.append('data', blob, 'memento.json');
       formData.append('epochs', '100');
 
-      console.log('開始上傳到 Walrus...');
-      
       const response = await fetch('/api/walrus', {
         method: 'PUT',
         body: formData,
@@ -94,7 +88,12 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
       const result = await response.json();
       console.log('Walrus 上傳成功:', result);
 
-      // 4. 調用 onSubmit 並關閉對話框
+      // 提取 blobId
+      const blobId = result.newlyCreated.blobObject.blobId;
+      console.log('獲取到的 blobId:', blobId);
+
+      // TODO: 調用 createMemento transaction
+      
       onSubmit({
         ...data,
         name: data.name.trim(),
@@ -105,7 +104,6 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
       onClose();
     } catch (error) {
       console.error('建立 Memento 失敗:', error);
-      // TODO: 添加錯誤提示 UI
     }
   };
 
