@@ -221,19 +221,19 @@ export default function CreateMementoDialog({
           )}
           
           {status.type === 'success' && (
-            <div className="space-y-2">
-              <div className="text-green-700">
-                <span>{`>`} {status.message}</span>
-                <span className="animate-blink">_</span>
-              </div>
-              {status.digest && (
-                <div className="text-xs">
-                  <div className="text-gray-600">Transaction Digest:</div>
-                  <div className="font-mono break-all text-gray-800 bg-black/5 p-2 mt-1">
-                    {status.digest}
-                  </div>
-                </div>
-              )}
+            <div className="flex flex-col gap-1">
+              <span className="text-green-600 font-mono">
+                {`>`} Memory preserved forever
+                <span className="animate-[blink_1s_infinite]">_</span>
+              </span>
+              <a 
+                href={`https://suiexplorer.com/txblock/${status.digest}?network=testnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 hover:text-gray-700 underline ml-4 font-mono"
+              >
+                view on explorer
+              </a>
             </div>
           )}
           

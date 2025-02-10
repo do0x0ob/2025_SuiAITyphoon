@@ -13,6 +13,8 @@ import AboutContent from '@/components/AboutContent';
 import MementoWindow from '@/components/MementoWindow';
 import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDialog';
 import { useSuiClient, useCurrentAccount } from '@mysten/dapp-kit';
+import CaptureMomentWindow from '@/components/CaptureMomentWindow';
+import { PACKAGE_ID } from '@/utils/transactions';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -28,6 +30,7 @@ const defaultWindowSizes = {
   walrusupload: { width: 540, height: 400 },
   walrusview: { width: 365, height: 446 },
   'memento-create': { width: 480, height: 520 },
+  'capture-moment': { width: 480, height: 520 },
 };
 
 interface WindowState {
@@ -40,6 +43,30 @@ interface WindowState {
 export default function Home() {
   const suiClient = useSuiClient();
   const currentAccount = useCurrentAccount();
+  const [currentOsId, setCurrentOsId] = useState<string>('');
+
+  // 獲取用戶的 OS ID
+  useEffect(() => {
+    const fetchOsId = async () => {
+      if (!currentAccount) return;
+      
+      try {
+        const { data: objects } = await suiClient.getOwnedObjects({
+          owner: currentAccount.address,
+          options: { showType: true },
+          filter: { StructType: `${PACKAGE_ID}::memento::OS` }
+        });
+        
+        if (objects && objects[0]) {
+          setCurrentOsId(objects[0].data?.objectId || '');
+        }
+      } catch (error) {
+        console.error('Error fetching OS ID:', error);
+      }
+    };
+
+    fetchOsId();
+  }, [currentAccount, suiClient]);
 
   // 計算視窗中心位置的函數
   const getCenterPosition = (width: number, height: number) => {
@@ -67,6 +94,7 @@ export default function Home() {
     walrusupload: { x: 350, y: 350 },
     walrusview: { x: 400, y: 400 },
     'memento-create': { x: 250, y: 250 },
+    'capture-moment': { x: 250, y: 250 },
   });
   const [windowSizes, setWindowSizes] = useState(defaultWindowSizes);
   const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
@@ -319,7 +347,20 @@ export default function Home() {
                           
                           setIsCreateMementoOpen(true);
                           handleWindowActivate('memento-create');
-                        }} 
+                        }}
+                        onCaptureMoment={() => {
+                          const mementoPos = windowPositions.memento;
+                          const mementoSize = windowSizes.memento;
+                          setWindowPositions(prev => ({
+                            ...prev,
+                            'capture-moment': {
+                              x: mementoPos.x + mementoSize.width - 1000,
+                              y: mementoPos.y,
+                            }
+                          }));
+                          
+                          handleWindowActivate('capture-moment');
+                        }}
                       />
                     </Window>
                   );
@@ -437,10 +478,27 @@ export default function Home() {
                       <WalrusView />
                     </Window>
                   );
+                case 'capture-moment':
+                  return (
+                    <Window
+                      key={name}
+                      name={name}
+                      title="Capture Moment"
+                      position={windowPositions['capture-moment']}
+                      size={windowSizes['capture-moment']}
+                      isActive={activeWindow === 'capture-moment'}
+                      resizable={true}
+                      onClose={handleCloseWindow}
+                      onDragStart={handleDragStart}
+                      onResize={handleResize}
+                      onClick={() => handleWindowActivate('capture-moment')}
+                    >
+                      <CaptureMomentWindow osId={currentOsId} />
+                    </Window>
+                  );
               }
             })}
 
-            {/* 將 CreateMementoDialog 移到這裡 */}
             {isCreateMementoOpen && (
               <Window
                 key="memento-create"
@@ -449,9 +507,10 @@ export default function Home() {
                 position={windowPositions['memento-create']}
                 size={windowSizes['memento-create']}
                 isActive={activeWindow === 'memento-create'}
-                resizable={false}
+                resizable={true}
                 onClose={() => setIsCreateMementoOpen(false)}
                 onDragStart={handleDragStart}
+                onResize={handleResize}
                 onClick={() => handleWindowActivate('memento-create')}
               >
                 <CreateMementoDialog

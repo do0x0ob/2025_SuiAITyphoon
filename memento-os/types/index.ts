@@ -1,5 +1,14 @@
 // Window 相關類型
-export type WindowName = 'memento' | 'phonebook' | 'eventbook' | 'about' | 'help' | 'walrusupload' | 'walrusview';
+export type WindowName = 
+  | 'memento' 
+  | 'phonebook' 
+  | 'eventbook' 
+  | 'about' 
+  | 'help' 
+  | 'walrusupload' 
+  | 'walrusview'
+  | 'memento-create'
+  | 'capture-moment';
 
 // Chat 相關類型
 export type ChatRole = 'user' | 'assistant' | 'system';

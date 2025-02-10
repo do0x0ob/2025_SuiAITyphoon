@@ -13,6 +13,7 @@ interface WindowProps {
   onResize?: (e: React.MouseEvent, name: WindowName) => void;
   onClick?: () => void;
   children: React.ReactNode;
+  className?: string;
 }
 
 const Window: React.FC<WindowProps> = ({
@@ -27,6 +28,7 @@ const Window: React.FC<WindowProps> = ({
   onResize,
   onClick,
   children,
+  className,
 }) => {
   const bgStyle = {
     backgroundColor: '#FFF5F5',  // 改為與主畫面相同的背景色
@@ -37,7 +39,7 @@ const Window: React.FC<WindowProps> = ({
     <div
       className={`absolute ${
         isActive ? 'z-50' : 'z-40'
-      }`}
+      } ${className || ''}`}
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
