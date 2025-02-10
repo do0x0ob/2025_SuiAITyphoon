@@ -1,7 +1,6 @@
 import { bcs } from "@mysten/sui/bcs";
 import { Transaction as TX } from "@mysten/sui/transactions";
 
-// 修改常量定義，加上 export
 export const PACKAGE_ID = '0x0d770311943b62d983795874dc490b1dde5519d81070c37b75422139a6411011';
 export const STATE_ID = '0x8f1361249afeafb4667f2cd97efb0b4a4d71a8cf1fa55259c42017281f5a8f2e';
 
