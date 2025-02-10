@@ -16,6 +16,7 @@ Memento OS is a unique platform that bridges the digital and eternal, allowing u
 
 - **Memory Preservation**: Create and store digital mementos of loved ones
 - **Interactive Conversations**: Engage in AI-powered dialogues that honor the unique characteristics of each memento
+- **Capture Moments**: Record the memorable moments of your life with Walrus and revisit them anytime
 - **Decentralized Storage**: Built on the Sui blockchain for permanence, leveraging Walrus to ensure secure and lasting memory preservation
 - **Walrus Tool**: upload and access photos through an intuitive UI
 
