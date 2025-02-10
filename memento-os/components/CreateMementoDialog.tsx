@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { useOSObject } from '@/hooks/useOSObject';
+import { uploadToWalrus } from '@/utils/walrus';
+import { createMemento } from '@/utils/transactions';
+import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 
 interface CreateMementoDialogProps {
   isOpen: boolean;
@@ -18,11 +22,69 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
     description: '',
     traits: []
   });
+  const [status, setStatus] = useState<'idle' | 'uploading' | 'creating' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const { osId, isLoading: isLoadingOS } = useOSObject();
+  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
-  const handleSubmit = () => {
-    if (data.name.trim()) {
-      onSubmit(data);
-      onClose();
+  const handleSubmit = async () => {
+    if (!data.name.trim() || !osId) return;
+
+    try {
+      // 開始上傳到 Walrus
+      setStatus('uploading');
+      let blobId;
+      try {
+        const result = await uploadToWalrus(data);
+        blobId = result.blobId;
+        if (!blobId) {
+          throw new Error('Failed to get blobId from Walrus');
+        }
+      } catch (error) {
+        setStatus('error');
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to upload to Walrus');
+        return; // 提早返回，不繼續執行後續操作
+      }
+
+      // 準備建立 Memento
+      setStatus('creating');
+      const tx = await createMemento(osId, data.name, blobId);
+
+      await signAndExecute({
+        transaction: tx as any,
+        chain: 'sui:testnet',
+      }, {
+        onSuccess: () => {
+          setStatus('success');
+          setTimeout(() => {
+            onClose();
+            onSubmit(data);
+          }, 2000);
+        },
+        onError: (error) => {
+          setStatus('error');
+          setErrorMessage(error instanceof Error ? error.message : 'Transaction failed');
+        }
+      });
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error');
+    }
+  };
+
+  // 添加狀態顯示 UI
+  const renderStatus = () => {
+    switch (status) {
+      case 'uploading':
+        return <div className="text-sm text-gray-600">正在上傳數據...</div>;
+      case 'creating':
+        return <div className="text-sm text-gray-600">正在創建 Memento...</div>;
+      case 'success':
+        return <div className="text-sm text-green-600">Memento 創建成功！</div>;
+      case 'error':
+        return <div className="text-sm text-red-600">錯誤：{errorMessage}</div>;
+      default:
+        return null;
     }
   };
 
@@ -85,6 +147,9 @@ export default function CreateMementoDialog({ isOpen, onClose, onSubmit }: Creat
             Create
           </button>
         </div>
+
+        {/* 狀態顯示 */}
+        {renderStatus()}
       </div>
     </div>
   );

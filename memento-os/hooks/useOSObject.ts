@@ -1,48 +1,45 @@
+import { useEffect, useState, useCallback } from 'react';
 import { useCurrentAccount, useSuiClient } from '@mysten/dapp-kit';
-import { useEffect, useState } from 'react';
 import { PACKAGE_ID } from '@/utils/transactions';
 
 const OS_TYPE = `${PACKAGE_ID}::memento::OS`;
 
 export function useOSObject() {
-  const currentAccount = useCurrentAccount();
-  const suiClient = useSuiClient();
   const [osId, setOsId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const currentAccount = useCurrentAccount();
+  const suiClient = useSuiClient();
+
+  const fetchOSObject = useCallback(async () => {
+    if (!currentAccount) {
+      setOsId(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data: objects } = await suiClient.getOwnedObjects({
+        owner: currentAccount.address,
+        filter: {
+          StructType: OS_TYPE
+        },
+        options: {
+          showType: true,
+        }
+      });
+
+      setOsId(objects && objects.length > 0 ? objects[0].data?.objectId || null : null);
+    } catch (error) {
+      console.error('Error fetching OS object:', error);
+      setOsId(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentAccount?.address, suiClient]);
 
   useEffect(() => {
-    const fetchOSObject = async () => {
-      if (!currentAccount) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const { data: objects } = await suiClient.getOwnedObjects({
-          owner: currentAccount.address,
-          filter: {
-            StructType: OS_TYPE
-          },
-          options: {
-            showType: true,
-          }
-        });
-
-        if (objects && objects.length > 0) {
-          setOsId(objects[0].data?.objectId || null);
-        }
-        setError(null);
-      } catch (err) {
-        setError('Failed to fetch OS object');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchOSObject();
-  }, [currentAccount, suiClient]);
+  }, [fetchOSObject]);
 
-  return { osId, isLoading, error };
+  return { osId, isLoading, refetch: fetchOSObject };
 } 

@@ -1,12 +1,12 @@
-import { ConnectButton, useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
 import { useState, useEffect, useCallback } from 'react';
 import { mintOS, PACKAGE_ID } from '@/utils/transactions';
 import CreateMementoDialog from './CreateMementoDialog';
 import { WindowName } from '@/types';
 import { MementoData } from '@/types/index';
+import { useOSObject } from '@/hooks/useOSObject';
 
-// 模擬用的臨時類型
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
 
 // NFT 類型常量
@@ -19,7 +19,7 @@ interface MementoWindowProps {
 
 export default function MementoWindow({ onDragStart, onCreateMemento }: MementoWindowProps) {
   const currentAccount = useCurrentAccount();
-  const suiClient = useSuiClient();
+  const { osId, isLoading, refetch } = useOSObject();
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('disconnected');
   const [username, setUsername] = useState('');
   const [digest, setDigest] = useState('');
@@ -32,34 +32,19 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
   
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
-  // 將 checkNFTOwnership 提取出來以便重用
-  const checkNFTOwnership = async () => {
+  // 使用 useEffect 監聽 osId 的變化來更新 walletStatus
+  useEffect(() => {
     if (!currentAccount) {
       setWalletStatus('disconnected');
       return;
     }
 
-    try {
-      const { data: objects } = await suiClient.getOwnedObjects({
-        owner: currentAccount.address,
-        filter: {
-          StructType: OS_TYPE
-        },
-        options: {
-          showType: true,
-        }
-      });
-
-      if (objects && objects.length > 0) {
-        setWalletStatus('connected-with-nft');
-      } else {
-        setWalletStatus('connected-no-nft');
-      }
-    } catch (error) {
-      console.error('Error checking NFT ownership:', error);
-      setWalletStatus('connected-no-nft');
+    if (isLoading) {
+      return;
     }
-  };
+
+    setWalletStatus(osId ? 'connected-with-nft' : 'connected-no-nft');
+  }, [currentAccount, osId, isLoading]);
 
   const handleInitializeOS = async () => {
     if (!currentAccount?.address || !username.trim()) return;
@@ -77,7 +62,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
           onSuccess: async (result) => {
             console.log("Transaction successful:", result);
             setDigest(result.digest);
-            await checkNFTOwnership();
+            await refetch();
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
@@ -90,48 +75,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
       setIsMinting(false);
     }
   };
-
-  // 定期檢查 NFT 所有權
-  useEffect(() => {
-    const checkNFTOwnership = async () => {
-      if (!currentAccount) {
-        setWalletStatus('disconnected');
-        setIsMinting(false); // 重置 minting 狀態
-        return;
-      }
-
-      try {
-        const { data: objects } = await suiClient.getOwnedObjects({
-          owner: currentAccount.address,
-          filter: {
-            StructType: OS_TYPE
-          },
-          options: {
-            showType: true,
-          }
-        });
-
-        if (objects && objects.length > 0) {
-          setWalletStatus('connected-with-nft');
-          setIsMinting(false); // 重置 minting 狀態
-        } else {
-          setWalletStatus('connected-no-nft');
-        }
-      } catch (error) {
-        console.error('Error checking NFT ownership:', error);
-        setWalletStatus('connected-no-nft');
-        setIsMinting(false); // 重置 minting 狀態
-      }
-    };
-
-    // 初始檢查
-    checkNFTOwnership();
-
-    // 設置定期檢查
-    const intervalId = setInterval(checkNFTOwnership, 3000);
-
-    return () => clearInterval(intervalId);
-  }, [currentAccount, suiClient]);
 
   // 添加鍵盤事件監聽
   useEffect(() => {
@@ -343,13 +286,6 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
           </div>
         )}
       </div>
-
-      {/* 添加 Dialog 組件 */}
-      <CreateMementoDialog
-        isOpen={isCreateMementoOpen}
-        onClose={() => setIsCreateMementoOpen(false)}
-        onSubmit={handleCreateMemento}
-      />
     </div>
   );
 }
