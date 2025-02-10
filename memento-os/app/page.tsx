@@ -12,6 +12,7 @@ import WalrusView from '@/components/WalrusView';
 import AboutContent from '@/components/AboutContent';
 import MementoWindow from '@/components/MementoWindow';
 import CreateMementoDialog, { MementoData } from '@/components/CreateMementoDialog';
+import { useSuiClient, useCurrentAccount } from '@mysten/dapp-kit';
 
 // 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
@@ -37,6 +38,9 @@ interface WindowState {
 }
 
 export default function Home() {
+  const suiClient = useSuiClient();
+  const currentAccount = useCurrentAccount();
+
   // 計算視窗中心位置的函數
   const getCenterPosition = (width: number, height: number) => {
     if (typeof window === 'undefined') return { x: 0, y: 0 };
@@ -448,6 +452,7 @@ export default function Home() {
                   isOpen={true}
                   onClose={() => setIsCreateMementoOpen(false)}
                   onSubmit={handleCreateMemento}
+                  currentAddress={currentAccount?.address}
                 />
               </Window>
             )}
