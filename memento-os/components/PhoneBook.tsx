@@ -15,6 +15,7 @@ export default function PhoneBook() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const atomaApi = new AtomaApiService();
+  const [selectedMemento, setSelectedMemento] = useState<Memento | null>(null);
 
   // 使用 hook 查詢 OS object
   const { data: osObjects } = useSuiClientQuery(
@@ -37,25 +38,30 @@ export default function PhoneBook() {
   // 當 OS objects 數據更新時獲取 mementos
   useEffect(() => {
     const fetchMementos = async () => {
-      if (!osObjects?.data?.length || !osObjects.data[0].data?.objectId) return;
+      if (!osObjects?.data?.length || !osObjects.data[0].data?.objectId) {
+        console.log('No OS objects found:', osObjects);
+        return;
+      }
 
       try {
         const osObject = await suiClient.getObject({
           id: osObjects.data[0].data.objectId,
           options: { showContent: true }
         });
+        
+        console.log('OS object:', osObject);
 
-        const mementosField = (osObject.data?.content as { fields?: { mementos: any } })?.fields?.mementos;
-        if (mementosField) {
-          const mementosData = (mementosField as any).fields?.contents?.fields?.contents || [];
-          console.log('Mementos data:', mementosData);
+        const mementosField = (osObject.data?.content as { fields?: { mementos: any[] } })?.fields?.mementos;
+        console.log('Mementos field:', mementosField);
 
-          const formattedMementos = mementosData.map((m: any) => ({
-            name: m.fields.name,
-            blobId: m.fields.blob_id,
-            objectId: m.fields.id.id
+        if (mementosField && Array.isArray(mementosField)) {
+          const formattedMementos = mementosField.map((m: any, index) => ({
+            name: m.fields?.name || 'Unnamed',
+            blobId: m.fields?.blob_id || '',
+            objectId: `${m.fields?.blob_id}-${index}` // 使用 blob_id 和索引組合作為唯一標識
           }));
-
+          
+          console.log('Formatted mementos:', formattedMementos);
           setMementos(formattedMementos);
         }
       } catch (error) {
@@ -112,21 +118,52 @@ export default function PhoneBook() {
     }
   };
 
+  const handleMementoSelect = async (memento: Memento) => {
+    console.log('Selected memento:', memento);
+    setSelectedMemento(memento);
+    
+    try {
+      const response = await fetch(`/api/walrus/${memento.blobId}`);
+      if (!response.ok) throw new Error('Failed to fetch memento data');
+      
+      const mementoData = await response.json();
+      console.log('Memento data from Walrus:', mementoData);
+      
+      // TODO: 將這個數據作為系統提示發送給 Atoma
+      // 先打印出來看看數據結構
+    } catch (error) {
+      console.error('Error fetching memento data:', error);
+    }
+  };
+
   return (
     <div className="flex h-full min-w-[800px]">
       {/* 左側 Mementos 展示區域 */}
       <div className="w-50 flex-none border-r border-black/20 p-4">
-        <div className="text-sm font-medium mb-2">Mementos</div>
+        <div className="text-sm font-bold text-black mb-2 text-center">Mementos</div>
         <div className="space-y-2">
           {mementos.length === 0 ? (
-            <div className="text-sm text-gray-500">No mementos found</div>
+            <div className="text-xs text-gray-500">No mementos found</div>
           ) : (
             mementos.map((memento) => (
               <div 
                 key={memento.objectId}
-                className="bg-black/5 p-2 rounded text-sm hover:bg-black/10 transition-colors cursor-pointer"
+                className="p-2 text-xs text-gray-600 cursor-pointer group flex items-center gap-2"
+                onClick={() => {
+                  console.log('Selected Memento:', {
+                    name: memento.name,
+                    blobId: memento.blobId,
+                    objectId: memento.objectId
+                  });
+                  setSelectedMemento(memento);
+                }}
               >
-                {memento.name}
+                <span className={`${
+                  selectedMemento?.objectId === memento.objectId 
+                    ? 'opacity-100' 
+                    : 'opacity-0 group-hover:opacity-100'
+                }`}>*</span>
+                <span>{memento.name}</span>
               </div>
             ))
           )}

@@ -21,12 +21,12 @@ const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
 
 const defaultWindowSizes = {
   memento: { width: 500, height: 600 },
-  phonebook: { width: 400, height: 600 },
+  phonebook: { width: 800, height: 600 },
   eventbook: { width: 400, height: 600 },
   about: { width: 540, height: 700 },
   help: { width: 500, height: 400 },
-  walrusupload: { width: 500, height: 400 },
-  walrusview: { width: 500, height: 400 },
+  walrusupload: { width: 540, height: 400 },
+  walrusview: { width: 540, height: 400 },
   'memento-create': { width: 480, height: 520 },
 };
 
