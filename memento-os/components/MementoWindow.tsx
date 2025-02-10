@@ -1,16 +1,12 @@
 import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { retroButtonStyles } from '@/styles/components';
 import { useState, useEffect, useCallback } from 'react';
-import { mintOS, PACKAGE_ID } from '@/utils/transactions';
-import CreateMementoDialog from './CreateMementoDialog';
+import { mintOS } from '@/utils/transactions';
 import { WindowName } from '@/types';
 import { MementoData } from '@/types/index';
 import { useOSObject } from '@/hooks/useOSObject';
 
 type WalletStatus = 'disconnected' | 'connected-no-nft' | 'connected-with-nft';
-
-// NFT 類型常量
-const OS_TYPE = `${PACKAGE_ID}::memento::OS`;
 
 interface MementoWindowProps {
   onDragStart: (e: React.MouseEvent<Element>, name: WindowName) => void;
@@ -23,16 +19,14 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
   const [walletStatus, setWalletStatus] = useState<WalletStatus>('disconnected');
   const [username, setUsername] = useState('');
   const [digest, setDigest] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [welcomeGifUrl, setWelcomeGifUrl] = useState<string>('');
   const [isGifLoading, setIsGifLoading] = useState(false);
   const [gifError, setGifError] = useState<string>('');
-  const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
-  
+
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
-  // 使用 useEffect 監聽 osId 的變化來更新 walletStatus
+
   useEffect(() => {
     if (!currentAccount) {
       setWalletStatus('disconnected');
@@ -202,7 +196,7 @@ export default function MementoWindow({ onDragStart, onCreateMemento }: MementoW
                   <div className="text-sm text-gray-500">Enter your name:</div>
                   <div className="flex items-center">
                     <span className="text-lg"> {username}</span>
-                    <span className={`ml-1 inline-block w-2 h-5 bg-black ${isTyping ? 'animate-pulse' : 'animate-blink'}`}>
+                    <span className={`ml-1 inline-block w-2 h-5 bg-black animate-blink`}>
                     </span>
                   </div>
                 </div>
