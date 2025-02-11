@@ -6,7 +6,7 @@ A digital sanctuary for cherished memories, built with Sui Move and powered by A
 
 ## 🚀 Live Demo
 
-Visit [Memento OS](https://memento-os.vercel.app/) to experience the platform or watch this [5-minute video](https://www.youtube.com/watch?v=B-9EgZcSk5U) for a quick overview.
+Visit [Memento OS](https://memento-os.vercel.app/) to experience the platform or watch this [5-minute video](https://youtu.be/SjUSiky1nKE) for a quick overview.
 
 ## 🌟 Overview
 
