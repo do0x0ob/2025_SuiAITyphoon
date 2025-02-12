@@ -14,7 +14,7 @@ Memento OS is a platform that lets you simulate conversations with loved ones wh
 
 ## 🔮 Features
 
-- **Private OS Space**: A retro OS-inspired interface designed to offer a calm, deeply personal, and highly customizable experience
+- **Personal OS Space**: A retro OS-inspired interface designed to offer a calm, deeply personal, and highly customizable experience
 - **Memory Preservation**: Create and store digital mementos of loved ones
 - **Interactive Conversations**: Engage in AI-powered dialogues that reflect the unique traits and personalities of each memento
 - **Capture Moments**: Preserve the highlights of your life with Walrus and revisit them anytime
