@@ -2,14 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 在這裡添加自定義樣式 */
+/* 滾動條樣式 */
+::-webkit-scrollbar {
+  width: 16px;
+  background: #f0f0f0;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-track {
+  background: repeating-linear-gradient(
+    45deg,
+    #f0f0f0,
+    #f0f0f0 2px,
+    #e8e8e8 2px,
+    #e8e8e8 4px
+  );
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d4d4d4;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.05),
+              inset 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #c4c4c4;
+}
+
+::-webkit-scrollbar-button {
+  display: block;
+  height: 16px;
+  background-color: #d4d4d4;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.1),
+              inset 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 動畫效果 */
 @keyframes typing {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
 
 @keyframes blink {
@@ -34,6 +67,7 @@
   animation: blink 1.5s step-end infinite;
 }
 
+/* 主題顏色 */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -46,24 +80,23 @@
   }
 }
 
+/* 基礎樣式 */
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Chicago', sans-serif; /* 使用 Chicago 字體 */
+  font-family: 'Chicago', sans-serif;
 }
 
-/* 添加復古的陰影效果 */
+/* 復古效果 */
 .window-shadow {
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
-/* 添加復古的邊框效果 */
 .retro-border {
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
 }
 
-/* 添加顆粒感 */
 .grain {
   position: relative;
 }
@@ -80,7 +113,7 @@ body {
   pointer-events: none;
 }
 
-/* 基礎按鈕樣式 */
+/* DappKit 按鈕樣式 */
 [data-dapp-kit] {
   background-color: rgba(255, 252, 250, 0.7) !important;
   border: 1px solid rgba(0, 0, 0, 0.8) !important;
@@ -96,7 +129,6 @@ body {
   gap: 8px !important;
 }
 
-/* 懸停效果 */
 [data-dapp-kit]:hover {
   background-color: rgba(255, 252, 250, 0.9) !important;
   box-shadow: 2px 2px 0 rgba(0,0,0,0.2) !important;
@@ -167,9 +199,9 @@ div.AccountDropdownMenu_separator__div2ql5 {
   display: none !important;
 }
 
-/* 添加圖片樣式 */
+/* 圖片樣式 */
 .memento-image {
-  image-rendering: pixelated;  /* 保持復古像素風格 */
+  image-rendering: pixelated;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
