@@ -34,12 +34,31 @@ const defaultWindowSizes = {
   'capture-moment': { width: 500, height: 580 },
 };
 
+// 將默認窗口位置提取為常量
+const defaultWindowPositions = {
+  memento: { x: 0, y: 0 },
+  phonebook: { x: 150, y: 150 },
+  eventbook: { x: 200, y: 200 },
+  about: { x: 300, y: 100 },
+  help: { x: 300, y: 300 },
+  walrusupload: { x: 350, y: 350 },
+  walrusview: { x: 400, y: 400 },
+  'memento-create': { x: 250, y: 250 },
+  'capture-moment': { x: 250, y: 250 },
+};
+
 interface WindowState {
   component: string;
   position: { x: number; y: number };
   size: { width: number; height: number };
   minimized: boolean;
 }
+
+// 提取共用的背景樣式
+const commonBackgroundStyle = {
+  backgroundColor: '#FFF5F5',
+  background: 'linear-gradient(rgba(255, 228, 230, 0.4), rgba(255, 228, 230, 0.4))',
+};
 
 export default function Home() {
   const suiClient = useSuiClient();
@@ -84,17 +103,7 @@ export default function Home() {
   const [openWindows, setOpenWindows] = useState<WindowName[]>(['memento']);
   const [activeWindow, setActiveWindow] = useState<WindowName | null>('memento');
   const [draggingWindow, setDraggingWindow] = useState<WindowName | null>(null);
-  const [windowPositions, setWindowPositions] = useState({
-    memento: { x: 0, y: 0 },
-    phonebook: { x: 150, y: 150 },
-    eventbook: { x: 200, y: 200 },
-    about: { x: 300, y: 100 },
-    help: { x: 300, y: 300 },
-    walrusupload: { x: 350, y: 350 },
-    walrusview: { x: 400, y: 400 },
-    'memento-create': { x: 250, y: 250 },
-    'capture-moment': { x: 250, y: 250 },
-  });
+  const [windowPositions, setWindowPositions] = useState(defaultWindowPositions);
   const [windowSizes, setWindowSizes] = useState(defaultWindowSizes);
   const [isCreateMementoOpen, setIsCreateMementoOpen] = useState(false);
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
@@ -110,21 +119,16 @@ export default function Home() {
 
   // 新增：處理窗口激活的函數
   const handleWindowActivate = (name: WindowName) => {
+    if (!openWindows.includes(name)) {
+      setOpenWindows(prev => [...prev, name]);
+    }
     setActiveWindow(name);
-    setOpenWindows(prev => [...prev.filter(w => w !== name), name]);
   };
 
   // 修改打開窗口的處理函數
   const handleOpenWindow = (name: WindowName) => {
-    // 先添加到打開列表中（如果還沒打開）
-    if (!openWindows.includes(name)) {
-      setOpenWindows(current => [...current, name]);
-    }
-
-    // 無論如何都要激活窗口
     handleWindowActivate(name);
     
-    // 如果是 Memento 窗口，設置中心位置
     if (name === 'memento') {
       const centerPosition = getCenterPosition(mementoSize.width, mementoSize.height);
       setWindowPositions(prev => ({
@@ -140,12 +144,6 @@ export default function Home() {
     if (activeWindow === name) {
       setActiveWindow(null);
     }
-  };
-
-  // 簡單的 Connect Wallet 功能
-  const connectWallet = () => {
-    console.log("Wallet connected!"); 
-    alert("Wallet connected!");
   };
 
   // 修改拖動開始的處理函數
@@ -222,17 +220,7 @@ export default function Home() {
         {/* 基礎背景 - 更淺的粉色 */}
         <div 
           className="absolute inset-0"
-          style={{
-            backgroundColor: '#FFF5F5',
-          }}
-        />
-
-        {/* 漸層效果 */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(rgba(255, 228, 230, 0.4), rgba(255, 228, 230, 0.4))',
-          }}
+          style={commonBackgroundStyle}
         />
 
         {/* 主要顆粒效果 */}
@@ -454,7 +442,7 @@ export default function Home() {
                               </div>
                             </div>
                               <div>
-                                <p className="font-medium">📸 Capture Moment</p>
+                                <p className="font-medium">�� Capture Moment</p>
                                 <p className="text-gray-600 ml-4">Save your memories with text and images on the blockchain.</p>
                               </div>
                               <div>
