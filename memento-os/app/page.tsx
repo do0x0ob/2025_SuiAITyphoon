@@ -17,7 +17,6 @@ import CaptureMomentWindow from '@/components/CaptureMomentWindow';
 import { PACKAGE_ID } from '@/utils/transactions';
 import EventBookWindow from '@/components/EventBookWindow';
 
-// 動態加載僅在客戶端渲染的組件
 const DesktopIcon = dynamic(() => import('@/components/DesktopIcon'), {
   ssr: false,
 });
