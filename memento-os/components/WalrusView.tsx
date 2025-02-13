@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function WalrusView() {
   const [blobId, setBlobId] = useState('');
@@ -15,9 +15,8 @@ export default function WalrusView() {
     };
   }, [blobUrl]);
 
-  const handleFetch = async () => {
+  const handleFetch = useCallback(async () => {
     if (!blobId.trim()) return;
-
 
     if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
@@ -26,6 +25,7 @@ export default function WalrusView() {
 
     setIsLoading(true);
     setError('');
+
     try {
       const cleanBlobId = blobId.split('/').pop()?.replace('blob:', '') || blobId;
       const response = await fetch(`/api/walrus/blob/${cleanBlobId}`);
@@ -45,7 +45,7 @@ export default function WalrusView() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [blobId, blobUrl]);
 
   return (
     <div className="flex flex-col h-full p-4">
@@ -56,6 +56,7 @@ export default function WalrusView() {
           onChange={(e) => setBlobId(e.target.value)}
           placeholder="Enter Blob ID"
           className="flex-1 px-3 py-1.5 border border-black/80 bg-white/70 focus:outline-none focus:bg-white/90 transition-colors"
+          disabled={isLoading}
         />
         <button
           onClick={handleFetch}
@@ -69,7 +70,10 @@ export default function WalrusView() {
         {error ? (
           <div className="text-red-500 p-3">{error}</div>
         ) : isLoading ? (
-          <div className="p-3">Loading...</div>
+          <div className="text-sm text-gray-500">
+            {`>`} Loading blob
+            <span className="animate-[blink_1s_infinite]">_</span>
+          </div>
         ) : blobUrl ? (
           <img 
             src={blobUrl} 
@@ -77,7 +81,7 @@ export default function WalrusView() {
             className="max-w-full h-auto"
           />
         ) : (
-          <div className="p-3 text-gray-500">
+          <div className="text-sm text-gray-500">
             Enter a blob ID and click Fetch to view content
           </div>
         )}

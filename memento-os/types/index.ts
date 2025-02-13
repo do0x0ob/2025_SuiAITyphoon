@@ -14,7 +14,7 @@ export type WindowName =
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: ChatRole;
   content: string;
 }
 
@@ -31,5 +31,29 @@ export interface Memento {
   objectId: string;
 }
 
+export interface MementoData {
+  name: string;
+  description: string;
+  traits: string[];
+}
+
+export interface MementoMetadata {
+  version: '1.0';
+  type: 'memento';
+  data: {
+    name: string;
+    description: string;
+    traits: string[];
+    createdAt: string;
+  };
+}
+
+export type StatusType = 'idle' | 'uploading-metadata' | 'uploading-chain' | 'success' | 'error';
+
+export interface StatusState {
+  type: StatusType;
+  message: string;
+  digest?: string;
+}
 
 // 其他類型定義...

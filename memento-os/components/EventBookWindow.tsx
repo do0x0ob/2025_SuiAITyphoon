@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useCurrentAccount, useSuiClient } from '@mysten/dapp-kit';
-import { PACKAGE_ID } from '@/utils/transactions';
 
 interface Moment {
   title: string;

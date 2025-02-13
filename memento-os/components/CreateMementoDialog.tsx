@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSuiClient, useSuiClientQuery, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { PACKAGE_ID, createMemento } from '@/utils/transactions';
+import { StatusType, StatusState } from '@/types/index';
 
 interface CreateMementoDialogProps {
   isOpen: boolean;
@@ -25,15 +26,6 @@ interface MementoMetadata {
     traits: string[];
     createdAt: string;
   };
-}
-
-// 擴展狀態類型
-type StatusType = 'idle' | 'uploading-metadata' | 'uploading-chain' | 'success' | 'error';
-
-interface StatusState {
-  type: StatusType;
-  message: string;
-  digest?: string;
 }
 
 export default function CreateMementoDialog({ 
@@ -71,11 +63,15 @@ export default function CreateMementoDialog({
   // 修改 traits 處理方法
   const [traitsInput, setTraitsInput] = useState('');  // 新增狀態來存儲原始輸入
 
-  // 更新狀態定義
   const [status, setStatus] = useState<StatusState>({
     type: 'idle',
     message: ''
   });
+
+  // 使用一個函數來更新狀態
+  const updateStatus = (type: StatusType, message: string, digest?: string) => {
+    setStatus({ type, message, digest });
+  };
 
   const handleTraitsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -115,10 +111,7 @@ export default function CreateMementoDialog({
     if (!data.name.trim() || !currentAddress) return;
 
     try {
-      setStatus({
-        type: 'uploading-metadata',
-        message: 'Collecting memory fragments'
-      });
+      updateStatus('uploading-metadata', 'Collecting memory fragments');
 
       // 1. 準備 metadata
       const metadata: MementoMetadata = {
@@ -161,19 +154,13 @@ export default function CreateMementoDialog({
       console.log('獲取到的 blobId:', blobId);
 
       // 3. 獲取 OS object id
-      setStatus({
-        type: 'uploading-metadata',
-        message: 'Weaving memories into eternity'
-      });
+      updateStatus('uploading-metadata', 'Weaving memories into eternity');
 
       const osId = await getOSObjectId(currentAddress);
       console.log('獲取到的 OS ID:', osId);
 
       // 4. 調用 createMemento transaction
-      setStatus({
-        type: 'uploading-chain',
-        message: 'Inscribing memories onto the eternal chain...'
-      });
+      updateStatus('uploading-chain', 'Inscribing memories onto the eternal chain...');
 
       const tx = await createMemento(osId, data.name.trim(), blobId);
       
@@ -183,25 +170,15 @@ export default function CreateMementoDialog({
       }, {
         onSuccess: (result) => {
           console.log('Transaction successful:', result);
-          setStatus({
-            type: 'success',
-            message: 'Memory preserved forever',
-            digest: result.digest
-          });
+          updateStatus('success', 'Memory preserved forever', result.digest);
         },
         onError: (error) => {
-          setStatus({
-            type: 'error',
-            message: 'Failed to preserve memory. Please try again.'
-          });
+          updateStatus('error', 'Failed to preserve memory. Please try again.');
         }
       });
 
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Failed to collect memory fragments. Please try again.'
-      });
+      updateStatus('error', 'Failed to collect memory fragments. Please try again.');
     }
   };
 
