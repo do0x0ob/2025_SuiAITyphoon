@@ -42,7 +42,7 @@ Memento OS is a platform that lets you simulate conversations with loved ones wh
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/memento-os.git
+git clone https://github.com/do0x0ob/2025_SuiAITyphoon
 cd memento-os
 ```
   
